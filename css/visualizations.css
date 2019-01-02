@@ -23,3 +23,32 @@ line {
         max-width: 1500px;
     }
 }
+
+table {
+    border-collapse: collapse;
+    overflow-x: scroll;
+    display: block;
+}
+
+thead {
+    background-color: #282828;
+    color: white;
+}
+
+thead, tbody {
+    display: block;
+}
+
+tbody {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 400px;
+}
+
+td, th {
+    min-width: 100px;
+    height: 25px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100px;
+}

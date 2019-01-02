@@ -1,5 +1,12 @@
 function createBarChart(chartDivId, xData, yData, totalEntries, items, xLabel, yLabel, title) {
 
+    var cols = ["Numero", "Nome", "CursoNome", "AnoLetivoMatricula", "EstadoMatricula", "AnoCurricular",
+        "IND2_1", "ECTS_InscritosAnoAtual", "ECTS_InscritoAnoAtualSemestre1", "ECTS_FeitosAnoAtual",
+        "IND2_2", "Propina_TotalEmDivida",
+        "IND2_3", "BolsaSAS_EstadoBolsa",
+        "IND2_4", "IngressoRG_nota",
+        "IND2_5", "NumUCinscritas", "UC1_Assiduidade", "UC2_Assiduidade", "UC3_Assiduidade", "UC4_Assiduidade", "UC5_Assiduidade"];
+
     const svg = d3.select(chartDivId)
         .append("svg")
         .attr("width", width + 1.2 * margin)
@@ -64,7 +71,6 @@ function createBarChart(chartDivId, xData, yData, totalEntries, items, xLabel, y
             if (actual > 0) {
                 // var cols = Object.keys(items[i][0]);
                 // console.log(cols);
-                var cols = ["Numero", "Nome", "CursoNome", "AnoLetivoMatricula", "EstadoMatricula"];
                 tabulate(items[i], cols);
             }
 
@@ -106,6 +112,8 @@ function createBarChart(chartDivId, xData, yData, totalEntries, items, xLabel, y
         .attr("y", margin * 0.75)
         .attr("text-anchor", "middle");
 
+    tabulate([], cols);
+
     function tabulate(data, columns) {
         var table = d3.select('table');
         table.selectAll("*").remove();
@@ -135,6 +143,11 @@ function createBarChart(chartDivId, xData, yData, totalEntries, items, xLabel, y
             .enter()
             .append('td')
             .text(function (d) { return d.value; });
+
+        $('table').on('scroll', function () {
+            $("#studentsTable > *").width($(this).width() + $(this).scrollLeft());
+        });
+        $("#studentsTable").scrollLeft(0);
 
         return table;
     }
