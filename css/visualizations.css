@@ -1,0 +1,25 @@
+.axis path {
+    fill: none;
+    stroke: black;
+}
+
+.axis {
+    font-size: 8pt;
+    font-family: sans-serif;
+}
+
+.tick {
+    fill: none;
+    stroke: black;
+}
+
+line {
+    stroke: black;
+    opacity: 0.4;
+}
+
+@media (min-width: 1500px) {
+    .container {
+        max-width: 1500px;
+    }
+}

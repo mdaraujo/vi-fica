@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>FICA - Home</title>
+
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+    <div class="container mt-5">
+
+        <h1>FICA - Estudantes em risco</h1>
+        <p class="lead">O FICA – Ferramentas de Identificação e Combate ao Abandono tem por objetivo contribuir para a diminuição e prevenção
+            do abandono e a melhoria do sucesso académico dos estudantes da UA.</p>
+
+        <h3>Ferramentas</h3>
+        <p class="lead">
+            Identificar/sinalizar os estudantes em risco:
+
+            <div class="list-group">
+                <a href="visualizations/indicators.html" class="list-group-item list-group-item-action">Por Indicador</a>
+                <a href="visualizations/acumulatedIndicators.html" class="list-group-item list-group-item-action">Por Acumulação de Indicadores</a>
+                <a href="#" class="list-group-item list-group-item-action">Por Comparação Mensal de Indicadores</a>
+            </div>
+        </p>
+
+        <h3>Indicadores</h3>
+        <ul id="listIndicators"></ul>
+
+    </div>
+
+    <script type="text/javascript" src="js/d3.min.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>
+
+    <script type="text/javascript">
+
+        d3.csv("config/indicators.csv", function (error, data) {
+            if (error) throw error;
+
+            var indList = document.getElementById("listIndicators");
+
+            data.forEach(function (entry) {
+
+                var el = document.createElement("li");
+                el.innerHTML = entry.name + " - " + entry.description;
+                indList.appendChild(el);
+
+            });
+
+        });
+
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>FICA - Por Acumulação de Indicadores</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/visualizations.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md">
+                <div id="chart"></div>
+            </div>
+            <div class="col-md mt-2">
+                <table class="table table-striped">
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+    <script type="text/javascript" src="../js/d3.min.js"></script>
+    <script type="text/javascript" src="../js/main.js"></script>
+
+    <script type="text/javascript">
+
+        const margin = 60;
+        const width = 1000 - 2 * margin;
+        const height = 600 - 2 * margin;
+
+        d3.queue()
+            .defer(d3.csv, "../config/indicators.csv")
+            .defer(d3.csv, "../data/Global/FICA_20180228.csv")
+            .await(function (error, indicators, data) {
+                if (error) throw error;
+
+                // parse values to integers
+                indicators.forEach(function (ind) { ind['value'] = +ind['value']; });
+
+                // process data
+                var acumulatedIndicatorsCounter = new Array(indicators.length + 1).fill(0);
+
+                var indicatorStudents = new Array(indicators.length);
+                for (var i = 0; i < indicatorStudents.length; i++) {
+                    indicatorStudents[i] = [];
+                }
+
+                var numEntries = 0;
+                data.forEach(function (entry) {
+
+                    var acumulated = 0;
+                    var i;
+                    for (i = 0; i < indicators.length; i++) {
+                        if (+entry[indicators[i]['column']] >= indicators[i]['value']) {
+                            acumulated++;
+                        }
+                    }
+
+                    acumulatedIndicatorsCounter[acumulated]++;
+                    indicatorStudents[acumulated].push(entry);
+
+                    numEntries++;
+                    // console.log(entry);
+                });
+
+                // console.log(acumulatedIndicatorsCounter);
+                // console.log(numEntries);
+                // console.log(indicatorStudents);
+
+                var numberOfAcumulatedIndicators = ["0", "1", "2", "3", "4", "5"];
+                createBarChart('#chart',
+                    numberOfAcumulatedIndicators, acumulatedIndicatorsCounter, numEntries, indicatorStudents,
+                    "Nº de indicadores acumulados", "Nº de alunos", "Por Acumulação de Indicadores");
+            });
+
+
+
+    </script>
+</body>
+
+</html>

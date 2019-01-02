@@ -1,0 +1,6 @@
+column,name,value,description
+IND2_1,Sucesso,30,Estudantes com taxa de sucesso académico abaixo dos 50% dos ECTS a que estão inscritos (fevereiro e julho)
+IND2_2,Propinas,30,Estudantes com um valor de propinas em atraso maior do que 0
+IND2_3,Bolsa,20,Estudantes que pediram bolsa e não foi deferida (foi indeferida ou está em análise)
+IND2_4,Ingresso,30,Estudantes com nota de ingresso abaixo dos 120 pontos
+IND2_5,Assiduidade,30,Assiduidade inferior a 80% em pelo menos uma UC
