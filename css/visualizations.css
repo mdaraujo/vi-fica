@@ -24,31 +24,33 @@ line {
     }
 }
 
-table {
+.d3-table {
     border-collapse: collapse;
-    overflow-x: scroll;
+    overflow-x: auto;
     display: block;
 }
 
-thead {
+.d3-table thead {
     background-color: #282828;
     color: white;
 }
 
-thead, tbody {
+.d3-table thead, .d3-table tbody {
     display: block;
 }
 
-tbody {
+.d3-tabletbody {
     overflow-y: scroll;
     overflow-x: hidden;
     height: 400px;
 }
 
-td, th {
+.d3-table td,.d3-table th {
     min-width: 100px;
     height: 25px;
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 100px;
 }
+
+.full_w { width: 100%; }

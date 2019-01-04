@@ -111,7 +111,6 @@ function createBarChart(chartDivId, xData, yData, totalEntries, items, xLabel, y
         .attr("x", width / 2 + margin)
         .attr("y", margin * 0.75)
         .attr("text-anchor", "middle");
-
     tabulate([], cols);
 
     function tabulate(data, columns) {
@@ -153,3 +152,28 @@ function createBarChart(chartDivId, xData, yData, totalEntries, items, xLabel, y
     }
 
 }
+
+function lpad(string, padding, amount){
+    return ((''+padding).repeat(amount)+string).substr(-amount,amount)
+}
+
+function getLastDayOfMonth(date) {
+    let day = new Date(date);
+    return new Date(day.getFullYear(), day.getMonth()+1, 0);
+}
+
+function getNextMonth(date){
+    return new Date(date.getFullYear() + (date.getMonth()===11 ? 1 : 0), (date.getMonth()+1)%12, 1);
+}
+
+function getFileNames(type, start, end){
+    let files = [];
+    start = getLastDayOfMonth(start);
+    end = getLastDayOfMonth(end);
+    while(start<=end){
+        files.push(type + '/FICA_' + start.getFullYear() + lpad(start.getMonth()+1,0,2) + start.getDate());
+        start = new getLastDayOfMonth(getNextMonth(start));
+    }
+    return files;
+}
+
