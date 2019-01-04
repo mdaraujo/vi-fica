@@ -129,7 +129,7 @@
             for (var i = 0; i < localStorage.length; i++){
                 $('#'+localStorage.key(i)+'[type!=\'checkbox\']').val(localStorage[localStorage.key(i)]);
                 $('#'+localStorage.key(i)+'[type=\'checkbox\']').each(function () {
-                    if($(this).prop("checked") !== localStorage[localStorage.key(i)]){
+                    if(''+$(this).prop("checked") !== localStorage[localStorage.key(i)]){
                         $(this).prop("checked", localStorage[localStorage.key(i)]).trigger('change');
                     }
                 });
