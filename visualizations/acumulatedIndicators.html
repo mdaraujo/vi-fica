@@ -13,31 +13,30 @@
 </head>
 
 <body>
-<div class="fixed-top p-2" align="right" style="z-index: -1;">
+<div class="fixed-top p-2" align="right" style="z-index: 0;">
     <button class="btn btn-sm btn-info" onclick="$('#help').modal('show');">
         <i class="fas fa-info-circle mr-2"></i> Ajuda
     </button>
 </div>
 <div class="container">
-    <div class="row mt-2 table-secondary rounded p-2">
+    <div class="row mt-2 table-secondary rounded p-2" style="z-index: 1;">
         <div class="col-12 col-md-6 col-lg-3" align="center">
-            <a href="/index.html" class="btn btn-sm btn-light full_w">
+            <a href="../index.html" class="btn btn-sm btn-light full_w">
                 <i class="fas fa-home mr-2"></i> Menu
             </a>
         </div>
         <div class="col-12 col-md-6 col-lg-3" align="center">
-            <a href="/visualizations/indicators.html" class="btn btn-sm btn-light full_w">
+            <a href="indicators.html" class="btn btn-sm btn-light full_w">
                 <i class="fas fa-chart-bar mr-2"></i> Indicador
             </a>
         </div>
         <div class="col-12 col-md-6 col-lg-3" align="center">
-            <a href="/visualizations/acumulatedIndicators.html" class="btn btn-sm btn-light full_w active">
+            <a href="acumulatedIndicators.html" class="btn btn-sm btn-light full_w active">
                 <i class="fas fa-chart-area mr-2"></i> Acumulação de Indicadores
             </a>
         </div>
         <div class="col-12 col-md-6 col-lg-3" align="center">
             <a href="" class="btn btn-sm btn-light full_w">
-                <i class="fas fa-long-arrow-alt-left mr-1"></i>
                 <i class="fas fa-chart-line mr-2"></i> Evolução de Indicadores
             </a>
         </div>
@@ -128,8 +127,13 @@
 
     function checkLocalStorage(){
         for (var i = 0; i < localStorage.length; i++){
-            $('#'+localStorage.key(i)).val(localStorage[localStorage.key(i)]).trigger('change');
-        };
+            $('#'+localStorage.key(i)+'[type!=\'checkbox\']').val(localStorage[localStorage.key(i)]);
+            $('#'+localStorage.key(i)+'[type=\'checkbox\']').each(function () {
+                if($(this).prop("checked") !== localStorage[localStorage.key(i)]){
+                    $(this).prop("checked", localStorage[localStorage.key(i)]).trigger('change');
+                }
+            });
+        }
     }
 
     function update_graphs() {
@@ -152,7 +156,7 @@
             .defer(d3.csv, "../config/indicators.csv");
 
         for (var f = 0; f < files.length; f++) {
-            if ($('#type').find(":selected").data("courses").length > 0) {
+            if ($('#type').find(":selected").length > 0 && $('#type').find(":selected").data("courses").length > 0) {
                 loader.defer(d3.csv, "../data/" + files[f] + "_" + $("#courses").val() + ".csv");
             } else {
                 loader.defer(d3.csv, "../data/" + files[f] + ".csv");
@@ -168,6 +172,7 @@
                     $('#error').html('<h5 style="color: #a71d2a;" class="mt-3">Filtro inválido: ' + error.pop() + '/' + file + ' não existe!</h5>').show();
                     return;
                 }
+                $('#error').hide();
 
                 // parse values to integers
                 let indicators = dataSet.shift();
@@ -176,7 +181,7 @@
                 // process data
                 var acumulatedIndicatorsCounter = new Array(indicators.length + 1).fill(0);
 
-                var indicatorStudents = new Array(indicators.length);
+                var indicatorStudents = new Array(indicators.length + 1);
                 for (var i = 0; i < indicatorStudents.length; i++) {
                     indicatorStudents[i] = [];
                 }
@@ -206,8 +211,12 @@
     }
 
     $(document).ready(function () {
-        $('input, select').on("change", function () {
+        $('input[type!=\'checkbox\'], select').on("change", function () {
             localStorage[$(this).attr('id')] = $(this).val();
+        });
+
+        $('input[type=\'checkbox\']').on("focusout", function () {
+            localStorage[$(this).attr('id')] = $(this).prop('checked');
         });
 
         d3.csv("../config/courses.csv", function (error, data) {
@@ -222,8 +231,10 @@
         });
 
         $('#range_toggle').on("change", function () {
-            $("#end").animate({ width: "toggle" });
-            update_graphs();
+            if ($(this).prop('checked') !== $("#end").is(":visible")) {
+                $("#end").animate({ width: "toggle" });
+                update_graphs();
+            }
         });
 
         $('#type').on("change", function () {
