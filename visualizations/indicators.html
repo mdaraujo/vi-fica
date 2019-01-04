@@ -13,7 +13,7 @@
 </head>
 
 <body>
-    <div class="fixed-top p-2" align="right">
+    <div class="fixed-top p-2" align="right" style="z-index: -1;">
         <button class="btn btn-sm btn-info" onclick="$('#help').modal('show');">
             <i class="fas fa-info-circle mr-2"></i> Ajuda
         </button>
@@ -126,6 +126,12 @@
         const width = window.innerWidth / 2 - 2 * margin;
         const height = window.innerHeight / 2 - 2 * margin;
 
+        function checkLocalStorage(){
+            for (var i = 0; i < localStorage.length; i++){
+                $('#'+localStorage.key(i)).val(localStorage[localStorage.key(i)]).trigger('change');
+            };
+        }
+
         function update_graphs() {
             $('#chart').html('');
             $('#aux_chart').html('');
@@ -159,8 +165,7 @@
                     if (error) {
                         error = error.currentTarget.responseURL.split('/');
                         let file = error.pop();
-                        $('#error').html('<h5 style="color: #a71d2a;" class="mt-3">Filtro inválido: ' + error.pop() + '/' + file + ' não existe!</h5>');
-                        $('#error').show();
+                        $('#error').html('<h5 style="color: #a71d2a;" class="mt-3">Filtro inválido: ' + error.pop() + '/' + file + ' não existe!</h5>').show();
                         return;
                     }
 
@@ -196,6 +201,10 @@
         }
 
         $(document).ready(function () {
+            $('input, select').on("focusout", function () {
+                localStorage[$(this).attr('id')] = $(this).val();
+            });
+
             d3.csv("../config/courses.csv", function (error, data) {
                 if (error) return;
                 $('#type').find('option').remove();
@@ -203,6 +212,7 @@
                     $("#type").append($("<option></option>").text(entry.name)
                         .attr("value", entry.path).attr("data-courses", entry.values));
                 });
+                checkLocalStorage();
                 update_graphs();
             });
 
@@ -249,6 +259,8 @@
             let current = new Date();
             let date_pickers = $('.date-picker');
             date_pickers.val(current.getFullYear() + '-' + lpad(current.getMonth() + 1, 0, 2));
+
+            checkLocalStorage();
 
             date_pickers.datepicker({
                 format: 'yyyy-mm', autoclose: true, orientation: "top",
