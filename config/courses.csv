@@ -1,4 +1,6 @@
 name,path,values
 Global,Global,,
-Licenciaturas - Universitário,Lic_U,"C16,C53"
+Licenciatura (Univer.),Lic_U,"C16"
+Licenciatura (Polite.),Lic_P,"C72"
 Mestrado Integrado,MI,"C68"
+Curso T.S.Profissional,MI,"C1"
