@@ -10,7 +10,8 @@ function createBarChart(chartDivId, xData, yData, totalEntries, items, xLabel, y
     const svg = d3.select(chartDivId)
         .append("svg")
         .attr("width", width + 1.2 * margin)
-        .attr("height", height + 2 * margin);
+        .attr("height", height + 2 * margin)
+    // .style("border-style", "dotted");
 
     const chart = svg.append('g')
         .attr('transform', `translate(${margin}, ${margin})`);
@@ -66,11 +67,8 @@ function createBarChart(chartDivId, xData, yData, totalEntries, items, xLabel, y
                 .attr('width', xScale.bandwidth())
         })
         .on('click', function (actual, i) {
-            // console.log(i);
-            // console.log(actual);
+
             if (actual > 0) {
-                // var cols = Object.keys(items[i][0]);
-                // console.log(cols);
                 tabulate(items[i], cols);
             }
 
@@ -79,9 +77,20 @@ function createBarChart(chartDivId, xData, yData, totalEntries, items, xLabel, y
     bars.append('text')
         .attr('class', 'value')
         .attr('x', (d, i) => xScale(xData[i]) + xScale.bandwidth() / 2)
-        .attr('y', (d) => yScale(d) - 8)
+        .attr('y', (d) => yScale(d) - 20)
         .attr('text-anchor', 'middle')
-        .text((d) => `${(d / totalEntries * 100).toFixed(1)}%`)
+        .text((d) => d)
+        .style("font-size", "16px")
+        .style("font-weight", "bold")
+        .attr("fill", "black");
+
+    bars.append('text')
+        .attr('class', 'value')
+        .attr('x', (d, i) => xScale(xData[i]) + xScale.bandwidth() / 2)
+        .attr('y', (d) => yScale(d) - 5)
+        .attr('text-anchor', 'middle')
+        .text((d) => `(${(d / totalEntries * 100).toFixed(1)}%)`)
+        .style("font-size", "12px")
         .attr("fill", "black");
 
     chart.append('g')
@@ -90,6 +99,12 @@ function createBarChart(chartDivId, xData, yData, totalEntries, items, xLabel, y
             .scale(yScale)
             .tickSize(-width, 0, 0)
             .tickFormat(''));
+
+    svg.append("text")
+        .text("Número total de alunos: " + totalEntries)
+        .attr('x', margin * 0.2)
+        .attr('y', margin * 0.25)
+        .attr("fill", "black");
 
     svg.append("text")
         .text(xLabel)
@@ -109,9 +124,10 @@ function createBarChart(chartDivId, xData, yData, totalEntries, items, xLabel, y
     svg.append("text")
         .text(title)
         .attr("x", width / 2 + margin)
-        .attr("y", margin * 0.75)
+        .attr("y", margin * 0.3)
+        .style("font-size", "20px")
+        .style("font-weight", "bold")
         .attr("text-anchor", "middle");
-    tabulate([], cols);
 
     function tabulate(data, columns) {
         var table = d3.select('table');
@@ -153,25 +169,25 @@ function createBarChart(chartDivId, xData, yData, totalEntries, items, xLabel, y
 
 }
 
-function lpad(string, padding, amount){
-    return ((''+padding).repeat(amount)+string).substr(-amount,amount)
+function lpad(string, padding, amount) {
+    return (('' + padding).repeat(amount) + string).substr(-amount, amount)
 }
 
 function getLastDayOfMonth(date) {
     let day = new Date(date);
-    return new Date(day.getFullYear(), day.getMonth()+1, 0);
+    return new Date(day.getFullYear(), day.getMonth() + 1, 0);
 }
 
-function getNextMonth(date){
-    return new Date(date.getFullYear() + (date.getMonth()===11 ? 1 : 0), (date.getMonth()+1)%12, 1);
+function getNextMonth(date) {
+    return new Date(date.getFullYear() + (date.getMonth() === 11 ? 1 : 0), (date.getMonth() + 1) % 12, 1);
 }
 
-function getFileNames(type, start, end){
+function getFileNames(type, start, end) {
     let files = [];
     start = getLastDayOfMonth(start);
     end = getLastDayOfMonth(end);
-    while(start<=end){
-        files.push(type + '/FICA_' + start.getFullYear() + lpad(start.getMonth()+1,0,2) + start.getDate());
+    while (start <= end) {
+        files.push(type + '/FICA_' + start.getFullYear() + lpad(start.getMonth() + 1, 0, 2) + start.getDate());
         start = new getLastDayOfMonth(getNextMonth(start));
     }
     return files;

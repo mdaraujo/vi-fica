@@ -24,28 +24,28 @@ line {
     }
 }
 
-.d3-table {
+.table-fixed {
     border-collapse: collapse;
     overflow-x: auto;
     display: block;
 }
 
-.d3-table thead {
+.table-fixed thead {
     background-color: #282828;
     color: white;
 }
 
-.d3-table thead, .d3-table tbody {
+.table-fixed thead, .table-fixed tbody {
     display: block;
 }
 
-.d3-tabletbody {
+.table-fixed tbody {
     overflow-y: scroll;
     overflow-x: hidden;
-    height: 400px;
+    height: 300px;
 }
 
-.d3-table td,.d3-table th {
+.table-fixed td, .table-fixed th {
     min-width: 100px;
     height: 25px;
     overflow: hidden;
@@ -53,4 +53,6 @@ line {
     max-width: 100px;
 }
 
-.full_w { width: 100%; }
+.full_w {
+    width: 100%;
+}

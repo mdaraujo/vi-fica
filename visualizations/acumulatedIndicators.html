@@ -12,7 +12,7 @@
 <body>
 
     <div class="container">
-        <div class="row mt-1">
+        <div class="row mt-5">
             <div id="chart"></div>
             <div class="ml-5 mt-5">
                 <p> Número total de alunos: </p>
@@ -24,7 +24,7 @@
 
         <div class="row mt-5">
             <div class="table-responsive">
-                <table class="table table-striped" id="studentsTable"></table>
+                <table id="studentsTable" class="table table-fixed table-striped table-hover"></table>
             </div>
         </div>
     </div>
@@ -42,7 +42,7 @@
 
         d3.queue()
             .defer(d3.csv, "../config/indicators.csv")
-            .defer(d3.csv, "../data/Global/FICA_20180228.csv")
+            .defer(d3.csv, "../data/Global/FICA_20180331.csv")
             .await(function (error, indicators, data) {
                 if (error) throw error;
 
