@@ -42,7 +42,7 @@ line {
 .table-fixed tbody {
     overflow-y: scroll;
     overflow-x: hidden;
-    height: 300px;
+    height: 250px;
 }
 
 .table-fixed td, .table-fixed th {
@@ -59,4 +59,9 @@ line {
 
 body {
     overflow-y: scroll;
+}
+
+path {
+    fill: none;
+    stroke-width: 2px;
 }

@@ -24,7 +24,7 @@
             <div class="list-group">
                 <a href="visualizations/indicators.html" class="list-group-item list-group-item-action">Por Indicador</a>
                 <a href="visualizations/acumulatedIndicators.html" class="list-group-item list-group-item-action">Por Acumulação de Indicadores</a>
-                <a href="#" class="list-group-item list-group-item-action">Por Comparação Mensal de Indicadores</a>
+                <a href="visualizations/mensalEvolution.html" class="list-group-item list-group-item-action">Por Comparação Mensal de Indicadores</a>
             </div>
         </p>
 
@@ -47,7 +47,7 @@
             data.forEach(function (entry) {
 
                 var el = document.createElement("li");
-                el.innerHTML = entry.name + " - " + entry.description;
+                el.innerHTML = '<strong style="color:' + entry.color + '">' + entry.name + "</strong> - " + entry.description;
                 indList.appendChild(el);
 
             });

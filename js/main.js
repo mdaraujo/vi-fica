@@ -1,10 +1,50 @@
+var cols = ["Numero", "Nome", "CursoNome", "AnoLetivoMatricula", "EstadoMatricula", "AnoCurricular",
+    "IND2_1", "ECTS_InscritosAnoAtual", "ECTS_InscritoAnoAtualSemestre1", "ECTS_FeitosAnoAtual",
+    "IND2_2", "Propina_TotalEmDivida",
+    "IND2_3", "BolsaSAS_EstadoBolsa",
+    "IND2_4", "IngressoRG_nota",
+    "IND2_5", "NumUCinscritas", "UC1_Assiduidade", "UC2_Assiduidade", "UC3_Assiduidade", "UC4_Assiduidade", "UC5_Assiduidade"];
+
+function tabulate(data, columns) {
+    var table = d3.select('table');
+    table.selectAll("*").remove();
+    var thead = table.append('thead');
+    var tbody = table.append('tbody');
+
+    // append the header row
+    thead.append('tr')
+        .selectAll('th')
+        .data(columns).enter()
+        .append('th')
+        .text(function (column) { return column; });
+
+    // create a row for each object in the data
+    var rows = tbody.selectAll('tr')
+        .data(data)
+        .enter()
+        .append('tr');
+
+    // create a cell in each row for each column
+    var cells = rows.selectAll('td')
+        .data(function (row) {
+            return columns.map(function (column) {
+                return { column: column, value: row[column] };
+            });
+        })
+        .enter()
+        .append('td')
+        .text(function (d) { return d.value; });
+
+    $('table').on('scroll', function () {
+        $("#studentsTable > *").width($(this).width() + $(this).scrollLeft());
+    });
+    $("#studentsTable").scrollLeft(0);
+
+    return table;
+}
+
+
 function createBarChart(chartDivId, xData, yData, totalEntries, items, xLabel, yLabel, title) {
-    var cols = ["Numero", "Nome", "CursoNome", "AnoLetivoMatricula", "EstadoMatricula", "AnoCurricular",
-        "IND2_1", "ECTS_InscritosAnoAtual", "ECTS_InscritoAnoAtualSemestre1", "ECTS_FeitosAnoAtual",
-        "IND2_2", "Propina_TotalEmDivida",
-        "IND2_3", "BolsaSAS_EstadoBolsa",
-        "IND2_4", "IngressoRG_nota",
-        "IND2_5", "NumUCinscritas", "UC1_Assiduidade", "UC2_Assiduidade", "UC3_Assiduidade", "UC4_Assiduidade", "UC5_Assiduidade"];
 
     const svg = d3.select(chartDivId)
         .append("svg")
@@ -114,10 +154,10 @@ function createBarChart(chartDivId, xData, yData, totalEntries, items, xLabel, y
             $('#loading_table').show();
             d3.select(this.parentNode).selectAll("rect").attr("stroke-width", 0);
             d3.select(this).selectAll("rect").attr("stroke-width", 4).attr("stroke", "red");
-            setTimeout( function(){
+            setTimeout(function () {
                 tabulate(items[i], cols);
                 $('#loading_table').hide();
-            }, 500 );
+            }, 500);
         }
     }
 
@@ -139,45 +179,152 @@ function createBarChart(chartDivId, xData, yData, totalEntries, items, xLabel, y
             .attr('width', xScale.bandwidth());
     }
 
-    function tabulate(data, columns) {
-        var table = d3.select('table');
-        table.selectAll("*").remove();
-        var thead = table.append('thead');
-        var tbody = table.append('tbody');
+}
 
-        // append the header row
-        thead.append('tr')
-            .selectAll('th')
-            .data(columns).enter()
-            .append('th')
-            .text(function (column) { return column; });
 
-        // create a row for each object in the data
-        var rows = tbody.selectAll('tr')
-            .data(data)
-            .enter()
-            .append('tr');
 
-        // create a cell in each row for each column
-        var cells = rows.selectAll('td')
-            .data(function (row) {
-                return columns.map(function (column) {
-                    return { column: column, value: row[column] };
-                });
-            })
-            .enter()
-            .append('td')
-            .text(function (d) { return d.value; });
+function createLineGraph(graphDivId, xData, yData, totalEntries, items, indicatorsColors, xLabel, yLabel, title) {
 
-        $('table').on('scroll', function () {
-            $("#studentsTable > *").width($(this).width() + $(this).scrollLeft());
+    const radius = 8;
+
+    const svg = d3.select(graphDivId)
+        .append("svg")
+        .attr("width", width + 1.2 * margin)
+        .attr("height", height + 2 * margin)
+    // .style("border-style", "dotted");
+
+    const graph = svg.append('g')
+        .attr('transform', `translate(${margin}, ${margin})`);
+
+    const xScale = d3.scalePoint()
+        .range([0, width])
+        .domain(xData)
+        .padding(0.4);
+
+    allYData = [];
+
+    yData.forEach(ind => {
+        ind.forEach(val => {
+            allYData.push(val);
         });
-        $("#studentsTable").scrollLeft(0);
+    });
 
-        return table;
+    var yExtent = d3.extent(allYData);
+
+    const yScale = d3.scaleLinear()
+        .range([height, 0])
+        .domain([0, yExtent[1]]);
+
+    const makeYLines = () => d3.axisLeft()
+        .scale(yScale)
+
+    graph.append('g')
+        .attr('transform', `translate(0, ${height})`)
+        .call(d3.axisBottom(xScale));
+
+    graph.append('g')
+        .call(d3.axisLeft(yScale));
+
+
+    for (var ind = 0; ind < yData.length; ind++) {
+
+        var circles = graph.selectAll()
+            .data(yData[ind])
+            .enter()
+            .append('g');
+
+        circles.append('circle')
+            .attr('cx', (d, i) => xScale(xData[i]))
+            .attr('cy', (d) => yScale(d))
+            .attr('r', radius)
+            .attr('fill', indicatorsColors[ind])
+            .style("stroke", "black")
+            .style("stroke-width", 0)
+            .on('mouseenter', function (actual, i) {
+
+                d3.select(this)
+                    .transition()
+                    .duration(200)
+                    .attr('opacity', 0.6)
+                    .attr('r', radius * 1.3);
+
+                circles
+                    .append('text')
+                    .attr('class', 'circleValue')
+                    .attr('x', xScale(xData[i]) + radius)
+                    .attr('y', yScale(actual) - radius)
+                    .text(actual)
+                    .style("font-size", "14px")
+                    .style("font-weight", "bold")
+                    .attr("fill", "black");
+
+            })
+            .on('mouseleave', function (actual, i) {
+                d3.select(this)
+                    .transition()
+                    .duration(300)
+                    .attr('opacity', 1)
+                    .attr('r', radius);
+
+                circles.selectAll('.circleValue').remove();
+            })
+            .on('click', function (actual, i) {
+
+                if (actual > 0) {
+                    $('#studentsTable').html('');
+                    $('#loading_table').show();
+                    graph.selectAll("circle").style("stroke-width", 0);
+                    d3.select(this).style("stroke-width", 4).style("stroke", "black");
+                    setTimeout(function () {
+                        tabulate(items[i], cols);
+                        $('#loading_table').hide();
+                    }, 500);
+                }
+
+            });
+
+        var line = d3.line()
+            .x(function (d, i) { return xScale(xData[i]) })
+            .y(function (d) { return yScale(d) });
+
+        graph.append('path')
+            .attr('d', line(yData[ind]))
+            .attr('stroke', indicatorsColors[ind]);
+
     }
 
+    graph.append('g')
+        .attr('class', 'grid')
+        .call(d3.axisLeft()
+            .scale(yScale)
+            .tickSize(-width, 0, 0)
+            .tickFormat(''));
+
+    svg.append("text")
+        .text(xLabel)
+        .attr("x", width / 2 + margin)
+        .attr("y", height + 1.7 * margin)
+        .attr("text-anchor", "middle")
+        .attr("fill", "black");
+
+    svg.append("text")
+        .text(yLabel)
+        .attr('x', -(height / 2) - margin)
+        .attr('y', margin / 2.8)
+        .attr('transform', 'rotate(-90)')
+        .attr('text-anchor', 'middle')
+        .attr("fill", "black");
+
+    svg.append("text")
+        .text(title)
+        .attr("x", width / 2 + margin)
+        .attr("y", margin * 0.3)
+        .style("font-size", "20px")
+        .style("font-weight", "bold")
+        .attr("text-anchor", "middle");
+
 }
+
 
 function lpad(string, padding, amount) {
     return (('' + padding).repeat(amount) + string).substr(-amount, amount)

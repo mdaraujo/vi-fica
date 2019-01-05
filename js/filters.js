@@ -1,10 +1,10 @@
-function checkLocalStorage( elements ){
-    elements.each(function(){
+function checkLocalStorage(elements) {
+    elements.each(function () {
         let element_id = $(this).prop('id');
-        if (element_id in localStorage){
-            $('#'+element_id+'[type!=\'checkbox\']').val(localStorage[element_id]).trigger('change');
-            $('#'+element_id+'[type=\'checkbox\']').each(function () {
-                if(''+$(this).prop("checked") !== localStorage[element_id]){
+        if (element_id in localStorage) {
+            $('#' + element_id + '[type!=\'checkbox\']').val(localStorage[element_id]).trigger('change');
+            $('#' + element_id + '[type=\'checkbox\']').each(function () {
+                if ('' + $(this).prop("checked") !== localStorage[element_id]) {
                     $(this).prop("checked", localStorage[element_id]).trigger('change');
                 }
             });

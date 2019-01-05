@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>FICA - Por Indicador</title>
+    <title>FICA - Por Comparação Mensal de Indicadores</title>
 
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/"
         crossorigin="anonymous">
@@ -166,34 +166,69 @@
                         return;
                     }
 
+
+                    var months = [];
+
+                    for (var f = 0; f < files.length; f++) {
+                        var month = files[f].split("/")[1];
+                        month = month.split("_")[1];
+                        month = +month.substring(4, 6);
+                        month = $.fn.datepicker.dates['pt']['months'][month - 1];
+                        months.push(month);
+                    }
+
+                    console.log(months);
+
                     // parse values to integers
                     let indicators = dataSet.shift();
                     indicators.forEach(function (ind) { ind['value'] = +ind['value']; });
 
                     // process data
-                    var indicatorCounter = new Array(indicators.length).fill(0);
-                    var indicatorStudents = new Array(indicators.length);
-                    for (var i = 0; i < indicatorStudents.length; i++)
-                        indicatorStudents[i] = [];
-                    var numEntries = 0;
+                    var indicatorMensalCounter = new Array(indicators.length);
+                    for (var i = 0; i < indicatorMensalCounter.length; i++)
+                        indicatorMensalCounter[i] = new Array(months.length).fill(0);
+
+
+                    var indicatorMensalStudents = new Array(indicators.length);
+                    for (var i = 0; i < indicatorMensalStudents.length; i++) {
+                        indicatorMensalStudents[i] = new Array(months.length);
+
+                        for (var j = 0; j < indicatorMensalStudents[i].length; j++)
+                            indicatorMensalStudents[i][j] = [];
+                    }
+
+
+
+                    var totalMensalEntries = [];
+                    var month = 0;
 
                     dataSet.forEach(function (data) {
+                        var numEntries = 0;
+
                         data.forEach(function (entry) {
                             var i;
                             for (i = 0; i < indicators.length; i++) {
                                 if (+entry[indicators[i]['column']] >= indicators[i]['value']) {
-                                    indicatorCounter[i]++;
-                                    indicatorStudents[i].push(entry);
+                                    indicatorMensalCounter[i][month]++;
+                                    indicatorMensalStudents[i][month].push(entry);
                                 }
                             }
                             numEntries++;
                         });
+                        totalMensalEntries.push(numEntries);
+                        month++;
                     });
 
-                    var indicatorsNames = indicators.map(function (item) { return item['name']; });
-                    createBarChart('#chart',
-                        indicatorsNames, indicatorCounter, numEntries, indicatorStudents,
-                        "Indicadores", "Nº de alunos", "Por Indicador");
+                    console.log(indicatorMensalCounter);
+                    console.log(totalMensalEntries);
+
+                    console.log(indicatorMensalStudents);
+
+                    var indicatorsColors = indicators.map(function (item) { return item['color']; });
+                    console.log(indicatorsColors);
+                    createLineGraph('#chart',
+                        months, indicatorMensalCounter, totalMensalEntries, indicatorMensalStudents, indicatorsColors,
+                        "Mês", "Nº de alunos", "Por Comparação Mensal de Indicadores");
                 });
         }
     </script>
