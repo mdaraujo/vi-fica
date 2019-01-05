@@ -44,7 +44,7 @@ function tabulate(data, columns) {
 }
 
 
-function createBarChart(chartDivId, xData, yData, totalEntries, items, indicatorsColors, xLabel, yLabel, title) {
+function createBarChart(chartDivId, xData, yData, totalEntries, items, colors, xLabel, yLabel, title) {
 
     const svg = d3.select(chartDivId)
         .append("svg")
@@ -88,7 +88,7 @@ function createBarChart(chartDivId, xData, yData, totalEntries, items, indicator
     bars.append('rect')
         .attr("stroke", "black")
         .attr("stroke-width", 0)
-        .attr("fill", (d, i) => indicatorsColors[i])
+        .attr("fill", (d, i) => colors[i])
         .attr('x', (d, i) => xScale(xData[i]))
         .attr('y', (d) => yScale(d))
         .attr('height', (d) => height - yScale(d))
@@ -109,7 +109,12 @@ function createBarChart(chartDivId, xData, yData, totalEntries, items, indicator
         .attr('x', (d, i) => xScale(xData[i]) + xScale.bandwidth() / 2)
         .attr('y', (d) => yScale(d) - 5)
         .attr('text-anchor', 'middle')
-        .text((d) => `(${(d / totalEntries * 100).toFixed(1)}%)`)
+        .text((function (d, i) {
+            if (!Array.isArray(totalEntries))
+                return `(${(d / totalEntries * 100).toFixed(1)}%)`;
+            else
+                return `(${(d / totalEntries[i] * 100).toFixed(1)}%)`;
+        }))
         .style("font-size", "12px")
         .attr("fill", "black");
 
@@ -120,11 +125,14 @@ function createBarChart(chartDivId, xData, yData, totalEntries, items, indicator
             .tickSize(-width, 0, 0)
             .tickFormat(''));
 
-    svg.append("text")
-        .text("Número total de alunos: " + totalEntries)
-        .attr('x', margin * 0.2)
-        .attr('y', margin * 0.25)
-        .attr("fill", "black");
+    if (!Array.isArray(totalEntries)) {
+        svg.append("text")
+            .text("Número total de alunos: " + totalEntries)
+            .attr('x', margin * 0.2)
+            .attr('y', margin * 0.25)
+            .attr("fill", "black");
+    }
+
 
     svg.append("text")
         .text(xLabel)
