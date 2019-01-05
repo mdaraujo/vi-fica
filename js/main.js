@@ -43,6 +43,9 @@ function createBarChart(chartDivId, xData, yData, totalEntries, items, xLabel, y
         .append('g');
 
     bars.append('rect')
+        .attr('class', 'mainBar')
+        .attr("stroke", "red")
+        .attr("stroke-width", 0)
         .attr('x', (d, i) => xScale(xData[i]))
         .attr('y', (d) => yScale(d))
         .attr('height', (d) => height - yScale(d))
@@ -67,9 +70,15 @@ function createBarChart(chartDivId, xData, yData, totalEntries, items, xLabel, y
                 .attr('width', xScale.bandwidth())
         })
         .on('click', function (actual, i) {
-
             if (actual > 0) {
-                tabulate(items[i], cols);
+                $('#studentsTable').html('');
+                $('#loading_table').show();
+                d3.selectAll(".mainBar").attr("stroke-width", 0);
+                d3.select(this).attr("stroke-width", 4).attr("stroke", "red");
+                setTimeout( function(){
+                    tabulate(items[i], cols);
+                    $('#loading_table').hide();
+                }, 500 );
             }
 
         });

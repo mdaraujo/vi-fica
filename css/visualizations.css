@@ -56,3 +56,7 @@ line {
 .full_w {
     width: 100%;
 }
+
+body {
+    overflow-y: scroll;
+}

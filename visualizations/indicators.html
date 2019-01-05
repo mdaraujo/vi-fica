@@ -43,13 +43,19 @@
         </div>
         <div class="row mt-2 table-secondary rounded">
             <form class="form-inline full_w p-2">
-                <div class="form-group col-12 col-lg-3 pl-3">
+                <div class="form-group col-6 col-lg-3 pl-3">
                     <label for="type">Tipo:</label>
                     <select id="type" class="form-control ml-2">
                     </select>
                 </div>
 
-                <div class="form-group col-12 col-md-8 col-lg-6 pl-3">
+                <div class="form-group col-6 col-lg-3 pl-3">
+                    <label for="courses" style="display: none;">Curso:</label>
+                    <select id="courses" class="form-control ml-2" style="display: none;">
+                    </select>
+                </div>
+
+                <div class="form-group col-12 col-lg-6 pl-3">
                     <label for="start">Mês:</label>
                     <input type="text" id="start" class="date-picker form-control ml-2 mr-2">
 
@@ -62,23 +68,16 @@
                         </div>
                         <input type="text" id="end" class="date-picker form-control" style="display: none;">
                     </div>
-
-                </div>
-
-                <div class="form-group col-12 col-lg-3 pl-3" style="display: none;">
-                    <label for="courses">Curso:</label>
-                    <select id="courses" class="form-control ml-2" style="display: none;">
-                    </select>
                 </div>
             </form>
         </div>
         <div class="row mt-2">
-            <div class="col-12" align="center" id="loading">
+            <div class="col-12 mt-5" align="center" id="loading">
                 <div class="spinner-border" role="status">
                     <span class="sr-only">Loading...</span>
                 </div>
             </div>
-            <div class="col-12" align="center" id="error">
+            <div class="col-12 mt-2" align="center" id="error">
             </div>
         </div>
         <div class="row mt-2">
@@ -87,6 +86,11 @@
             </div>
             <div class="col-12 col-lg-6">
                 <div id="aux_chart"></div>
+            </div>
+            <div class="col-12 mt-2" align="center" id="loading_table" style="display: none;">
+                <div class="spinner-border" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
             </div>
             <div class="col-12">
                 <div class="table-responsive">
@@ -119,22 +123,11 @@
     <script type="text/javascript" src="../js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../js/bootstrap-datepicker-1-4-1.min.js"></script>
     <script type="text/javascript" src="../js/main.js"></script>
-
+    <script type="text/javascript" src="../js/filters.js"></script>
     <script type="text/javascript">
         const margin = 80;
         const width = window.innerWidth / 2 - 2 * margin;
         const height = window.innerHeight / 2 - 2 * margin;
-
-        function checkLocalStorage(){
-            for (var i = 0; i < localStorage.length; i++){
-                $('#'+localStorage.key(i)+'[type!=\'checkbox\']').val(localStorage[localStorage.key(i)]);
-                $('#'+localStorage.key(i)+'[type=\'checkbox\']').each(function () {
-                    if(''+$(this).prop("checked") !== localStorage[localStorage.key(i)]){
-                        $(this).prop("checked", localStorage[localStorage.key(i)]).trigger('change');
-                    }
-                });
-            }
-        }
 
         function update_graphs() {
             $('#chart').html('');
@@ -172,7 +165,6 @@
                         $('#error').html('<h5 style="color: #a71d2a;" class="mt-3">Filtro inválido: ' + error.pop() + '/' + file + ' não existe!</h5>').show();
                         return;
                     }
-                    $('#error').hide();
 
                     // parse values to integers
                     let indicators = dataSet.shift();
@@ -204,99 +196,6 @@
                         "Indicadores", "Nº de alunos", "Por Indicador");
                 });
         }
-
-        $(document).ready(function () {
-            $('input[type!=\'checkbox\'], select').on("focusout", function () {
-                localStorage[$(this).attr('id')] = $(this).val();
-            });
-
-            $('input[type=\'checkbox\']').on("focusout", function () {
-                localStorage[$(this).attr('id')] = $(this).prop('checked');
-            });
-
-            d3.csv("../config/courses.csv", function (error, data) {
-                if (error) return;
-                $('#type').find('option').remove();
-                data.forEach(function (entry) {
-                    $("#type").append($("<option></option>").text(entry.name)
-                        .attr("value", entry.path).attr("data-courses", entry.values));
-                });
-                checkLocalStorage();
-                update_graphs();
-            });
-
-            $('#range_toggle').on("change", function () {
-                if ($(this).prop('checked') !== $("#end").is(":visible")) {
-                    $("#end").animate({ width: "toggle" });
-                    update_graphs();
-                }
-            });
-
-            $('#type').on("change", function () {
-                let courses = $("#courses");
-                if ($(this).find(':selected').length > 0 && $(this).find(':selected').data('courses').length > 0) {
-                    courses.find('option').remove();
-                    $(this).find(':selected').data('courses').split(',').forEach(function (entry) {
-                        $("#courses").append($("<option></option>").text(entry).attr("value", entry));
-                    });
-                    if ($("#courses:visible").length === 0) {
-                        courses.parent().show();
-                        courses.animate({ width: "toggle" });
-                    }
-                } else {
-                    if ($("#courses:visible").length > 0) {
-                        courses.animate({ width: "toggle" }, 500, function () {
-                            courses.parent().hide();
-                        });
-                    }
-                }
-                update_graphs();
-            });
-
-            $('#courses').on("change", function () {
-                update_graphs();
-            });
-
-            $.fn.datepicker.dates['pt'] = {
-                days: ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"],
-                daysShort: ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"],
-                daysMin: ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"],
-                months: ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"],
-                monthsShort: ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"],
-                today: "Hoje",
-                weekStart: 1,
-            };
-
-            let current = new Date();
-            let date_pickers = $('.date-picker');
-            date_pickers.val(current.getFullYear() + '-' + lpad(current.getMonth() + 1, 0, 2));
-
-            checkLocalStorage();
-
-            date_pickers.datepicker({
-                format: 'yyyy-mm', autoclose: true, orientation: "top",
-                language: "pt", startView: "years", minViewMode: "months"
-            }).on("changeDate", function (e) {
-                update_graphs();
-            });
-
-            d3.csv("../config/indicators.csv", function (error, data) {
-                if (!error) {
-                    data.forEach(function (entry) {
-                        $("#accordion").append(' \
-                            <div class="card">  \
-                                <div class="card-header" id="heading_' + entry.name + '"> \
-                                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse_' + entry.name + '" aria-expanded="false" aria-controls="collapseThree"> <i class="fas fa-hand-pointer mr-2"></i>' + entry.name + ' </button>   \
-                                </div>  \
-                                <div id="collapse_' + entry.name + '" class="collapse" aria-labelledby="heading_' + entry.name + '" data-parent="#accordion">   \
-                                    <div class="card-body"> ' + entry.description + ' </div>    \
-                                </div>  \
-                            </div>' );
-
-                    });
-                }
-            });
-        });
     </script>
 </body>
 
