@@ -214,10 +214,8 @@
                         month++;
                     });
 
-                    var indicatorsColors = indicators.map(function (item) { return item['color']; });
-
                     createLineGraph('#chart',
-                        months, indicatorMensalCounter, totalMensalEntries, indicatorMensalStudents, indicatorsColors,
+                        months, indicatorMensalCounter, totalMensalEntries, indicatorMensalStudents, indicators,
                         "Mês", "Nº de alunos", "Por Comparação Mensal de Indicadores");
                 });
         }

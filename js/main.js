@@ -184,7 +184,7 @@ function createBarChart(chartDivId, xData, yData, totalEntries, items, indicator
 
 
 
-function createLineGraph(graphDivId, xData, yData, totalEntries, items, indicatorsColors, xLabel, yLabel, title) {
+function createLineGraph(graphDivId, xData, yData, totalEntries, items, indicators, xLabel, yLabel, title) {
 
     const radius = 8;
 
@@ -239,10 +239,10 @@ function createLineGraph(graphDivId, xData, yData, totalEntries, items, indicato
             .attr('cy', (d) => yScale(d))
             .attr('r', radius)
             .attr('ind', ind) // just to store ind value
-            .attr('fill', indicatorsColors[ind])
+            .attr('fill', indicators[ind]['color'])
             .style("stroke", "black")
             .style("stroke-width", 0)
-            .on('mouseenter', function (actual, month) {
+            .on('mouseenter', function (actual, month, c) {
 
                 d3.select(this)
                     .transition()
@@ -250,8 +250,8 @@ function createLineGraph(graphDivId, xData, yData, totalEntries, items, indicato
                     .attr('opacity', 0.6)
                     .attr('r', radius * 1.3);
 
-                circles
-                    .append('text')
+
+                circles.append('text')
                     .attr('class', 'circleValue')
                     .attr('x', xScale(xData[month]) + radius)
                     .attr('y', yScale(actual) - radius)
@@ -259,6 +259,17 @@ function createLineGraph(graphDivId, xData, yData, totalEntries, items, indicato
                     .style("font-size", "14px")
                     .style("font-weight", "bold")
                     .attr("fill", "black");
+
+                var ind = c[month].getAttribute("ind");
+
+                circles.append('text')
+                    .attr('class', 'circleValue')
+                    .attr('x', xScale(xData[month]) + radius)
+                    .attr('y', yScale(actual) - radius - 15)
+                    .text(indicators[ind]['name'])
+                    .style("font-size", "14px")
+                    .style("font-weight", "bold")
+                    .attr("fill", indicators[ind]['color']);
 
             })
             .on('mouseleave', function (actual, month) {
@@ -270,11 +281,11 @@ function createLineGraph(graphDivId, xData, yData, totalEntries, items, indicato
 
                 circles.selectAll('.circleValue').remove();
             })
-            .on('click', function (actual, month, circles) {
+            .on('click', function (actual, month, c) {
 
                 if (actual > 0) {
                     // get indicator index from circle attribute, because ind var not available at click time
-                    var ind = circles[month].getAttribute("ind");
+                    var ind = c[month].getAttribute("ind");
                     $('#studentsTable').html('');
                     $('#loading_table').show();
                     graph.selectAll("circle").style("stroke-width", 0);
@@ -293,7 +304,7 @@ function createLineGraph(graphDivId, xData, yData, totalEntries, items, indicato
 
         graph.append('path')
             .attr('d', line(yData[ind]))
-            .attr('stroke', indicatorsColors[ind]);
+            .attr('stroke', indicators[ind]['color']);
     }
 
     graph.append('g')
