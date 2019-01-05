@@ -154,7 +154,7 @@ function createBarChart(chartDivId, xData, yData, totalEntries, items, indicator
             $('#studentsTable').html('');
             $('#loading_table').show();
             d3.select(this.parentNode).selectAll("rect").attr("stroke-width", 0);
-            d3.select(this).selectAll("rect").attr("stroke-width", 6).attr("stroke", "black");
+            d3.select(this).selectAll("rect").attr("stroke-width", 4);
             setTimeout(function () {
                 tabulate(items[i], cols);
                 $('#loading_table').hide();
@@ -185,7 +185,6 @@ function createBarChart(chartDivId, xData, yData, totalEntries, items, indicator
 
 
 function createLineGraph(graphDivId, xData, yData, totalEntries, items, indicators, xLabel, yLabel, title) {
-
     const radius = 8;
 
     const svg = d3.select(graphDivId)
@@ -242,14 +241,13 @@ function createLineGraph(graphDivId, xData, yData, totalEntries, items, indicato
             .attr('fill', indicators[ind]['color'])
             .style("stroke", "black")
             .style("stroke-width", 0)
+            .style("cursor", "pointer")
             .on('mouseenter', function (actual, month, c) {
-
                 d3.select(this)
                     .transition()
                     .duration(200)
                     .attr('opacity', 0.6)
                     .attr('r', radius * 1.3);
-
 
                 circles.append('text')
                     .attr('class', 'circleValue')
@@ -270,7 +268,6 @@ function createLineGraph(graphDivId, xData, yData, totalEntries, items, indicato
                     .style("font-size", "14px")
                     .style("font-weight", "bold")
                     .attr("fill", indicators[ind]['color']);
-
             })
             .on('mouseleave', function (actual, month) {
                 d3.select(this)
@@ -278,24 +275,21 @@ function createLineGraph(graphDivId, xData, yData, totalEntries, items, indicato
                     .duration(300)
                     .attr('opacity', 1)
                     .attr('r', radius);
-
                 circles.selectAll('.circleValue').remove();
             })
             .on('click', function (actual, month, c) {
-
                 if (actual > 0) {
                     // get indicator index from circle attribute, because ind var not available at click time
                     var ind = c[month].getAttribute("ind");
                     $('#studentsTable').html('');
                     $('#loading_table').show();
                     graph.selectAll("circle").style("stroke-width", 0);
-                    d3.select(this).style("stroke-width", 4).style("stroke", "black");
+                    d3.select(this).style("stroke-width", 4);
                     setTimeout(function () {
                         tabulate(items[ind][month], cols);
                         $('#loading_table').hide();
                     }, 500);
                 }
-
             });
 
         var line = d3.line()

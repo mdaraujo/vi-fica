@@ -85,7 +85,7 @@ $(document).ready(function () {
                 $("#accordion").append(' \
                             <div class="card">  \
                                 <div class="card-header" id="heading_' + entry.name + '"> \
-                                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse_' + entry.name + '" aria-expanded="false" aria-controls="collapseThree"> <i class="fas fa-hand-pointer mr-2"></i>' + entry.name + ' </button>   \
+                                    <button style="color:' + entry.color + '" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse_' + entry.name + '" aria-expanded="false" aria-controls="collapseThree"> <i class="fas fa-hand-pointer mr-2"></i>' + entry.name + ' </button>   \
                                 </div>  \
                                 <div id="collapse_' + entry.name + '" class="collapse" aria-labelledby="heading_' + entry.name + '" data-parent="#accordion">   \
                                     <div class="card-body"> ' + entry.description + ' </div>    \
