@@ -1,5 +1,4 @@
 function createBarChart(chartDivId, xData, yData, totalEntries, items, xLabel, yLabel, title) {
-
     var cols = ["Numero", "Nome", "CursoNome", "AnoLetivoMatricula", "EstadoMatricula", "AnoCurricular",
         "IND2_1", "ECTS_InscritosAnoAtual", "ECTS_InscritoAnoAtualSemestre1", "ECTS_FeitosAnoAtual",
         "IND2_2", "Propina_TotalEmDivida",
@@ -40,48 +39,19 @@ function createBarChart(chartDivId, xData, yData, totalEntries, items, xLabel, y
     const bars = chart.selectAll()
         .data(yData)
         .enter()
-        .append('g');
+        .append('g')
+        .style("cursor", "pointer")
+        .on('mouseenter', mainChartBarEnter)
+        .on('mouseleave', mainChartBarLeave)
+        .on('click', mainChartBarClick);
 
     bars.append('rect')
-        .attr('class', 'mainBar')
         .attr("stroke", "red")
         .attr("stroke-width", 0)
         .attr('x', (d, i) => xScale(xData[i]))
         .attr('y', (d) => yScale(d))
         .attr('height', (d) => height - yScale(d))
-        .attr('width', xScale.bandwidth())
-        .on('mouseenter', function (actual, i) {
-
-            d3.select(this)
-                .transition()
-                .duration(300)
-                .attr('opacity', 0.6)
-                .attr('x', xScale(xData[i]) - 5)
-                .attr('width', xScale.bandwidth() + 10)
-
-            // d3.select(this).attr('opacity', 0.8)
-        })
-        .on('mouseleave', function (actual, i) {
-            d3.select(this)
-                .transition()
-                .duration(300)
-                .attr('opacity', 1)
-                .attr('x', xScale(xData[i]))
-                .attr('width', xScale.bandwidth())
-        })
-        .on('click', function (actual, i) {
-            if (actual > 0) {
-                $('#studentsTable').html('');
-                $('#loading_table').show();
-                d3.selectAll(".mainBar").attr("stroke-width", 0);
-                d3.select(this).attr("stroke-width", 4).attr("stroke", "red");
-                setTimeout( function(){
-                    tabulate(items[i], cols);
-                    $('#loading_table').hide();
-                }, 500 );
-            }
-
-        });
+        .attr('width', xScale.bandwidth());
 
     bars.append('text')
         .attr('class', 'value')
@@ -137,6 +107,37 @@ function createBarChart(chartDivId, xData, yData, totalEntries, items, xLabel, y
         .style("font-size", "20px")
         .style("font-weight", "bold")
         .attr("text-anchor", "middle");
+
+    function mainChartBarClick(actual, i) {
+        if (actual > 0) {
+            $('#studentsTable').html('');
+            $('#loading_table').show();
+            d3.select(this.parentNode).selectAll("rect").attr("stroke-width", 0);
+            d3.select(this).selectAll("rect").attr("stroke-width", 4).attr("stroke", "red");
+            setTimeout( function(){
+                tabulate(items[i], cols);
+                $('#loading_table').hide();
+            }, 500 );
+        }
+    }
+
+    function mainChartBarEnter(actual, i) {
+        d3.select(this).selectAll("rect")
+            .transition()
+            .duration(300)
+            .attr('opacity', 0.6)
+            .attr('x', xScale(xData[i]) - 5)
+            .attr('width', xScale.bandwidth() + 10);
+    }
+
+    function mainChartBarLeave(actual, i) {
+        d3.select(this).selectAll("rect")
+            .transition()
+            .duration(300)
+            .attr('opacity', 1)
+            .attr('x', xScale(xData[i]))
+            .attr('width', xScale.bandwidth());
+    }
 
     function tabulate(data, columns) {
         var table = d3.select('table');

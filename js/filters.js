@@ -34,9 +34,10 @@ $(document).ready(function () {
         let courses = $("#courses");
         if ($(this).find(':selected').length > 0 && $(this).find(':selected').data('courses').length > 0) {
             courses.find('option').remove();
-            $(this).find(':selected').data('courses').split(',').forEach(function (entry) {
+            $(this).find(':selected').data('courses').split(';').forEach(function (entry) {
                 courses.append($("<option></option>").text(entry).attr("value", entry));
             });
+            checkLocalStorage(courses);
             if ($("#courses:visible").length === 0) {
                 $('label[for="courses"]').show();
                 courses.animate({ width: "toggle" });
@@ -101,7 +102,7 @@ $(document).ready(function () {
             $("#type").append($("<option></option>").text(entry.name)
                 .attr("value", entry.path).attr("data-courses", entry.values));
         });
-        checkLocalStorage($('select'));
+        checkLocalStorage($('#type'));
         checkLocalStorage($('input[type="checkbox"]'));
         update_graphs();
     });
