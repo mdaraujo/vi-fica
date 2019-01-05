@@ -235,13 +235,14 @@ function createLineGraph(graphDivId, xData, yData, totalEntries, items, indicato
             .append('g');
 
         circles.append('circle')
-            .attr('cx', (d, i) => xScale(xData[i]))
+            .attr('cx', (d, month) => xScale(xData[month]))
             .attr('cy', (d) => yScale(d))
             .attr('r', radius)
+            .attr('ind', ind) // just to store ind value
             .attr('fill', indicatorsColors[ind])
             .style("stroke", "black")
             .style("stroke-width", 0)
-            .on('mouseenter', function (actual, i) {
+            .on('mouseenter', function (actual, month) {
 
                 d3.select(this)
                     .transition()
@@ -252,7 +253,7 @@ function createLineGraph(graphDivId, xData, yData, totalEntries, items, indicato
                 circles
                     .append('text')
                     .attr('class', 'circleValue')
-                    .attr('x', xScale(xData[i]) + radius)
+                    .attr('x', xScale(xData[month]) + radius)
                     .attr('y', yScale(actual) - radius)
                     .text(actual)
                     .style("font-size", "14px")
@@ -260,7 +261,7 @@ function createLineGraph(graphDivId, xData, yData, totalEntries, items, indicato
                     .attr("fill", "black");
 
             })
-            .on('mouseleave', function (actual, i) {
+            .on('mouseleave', function (actual, month) {
                 d3.select(this)
                     .transition()
                     .duration(300)
@@ -269,15 +270,17 @@ function createLineGraph(graphDivId, xData, yData, totalEntries, items, indicato
 
                 circles.selectAll('.circleValue').remove();
             })
-            .on('click', function (actual, i) {
+            .on('click', function (actual, month, circles) {
 
                 if (actual > 0) {
+                    // get indicator index from circle attribute, because ind var not available at click time
+                    var ind = circles[month].getAttribute("ind");
                     $('#studentsTable').html('');
                     $('#loading_table').show();
                     graph.selectAll("circle").style("stroke-width", 0);
                     d3.select(this).style("stroke-width", 4).style("stroke", "black");
                     setTimeout(function () {
-                        tabulate(items[i], cols);
+                        tabulate(items[ind][month], cols);
                         $('#loading_table').hide();
                     }, 500);
                 }
@@ -291,7 +294,6 @@ function createLineGraph(graphDivId, xData, yData, totalEntries, items, indicato
         graph.append('path')
             .attr('d', line(yData[ind]))
             .attr('stroke', indicatorsColors[ind]);
-
     }
 
     graph.append('g')

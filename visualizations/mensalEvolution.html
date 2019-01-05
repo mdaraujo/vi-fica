@@ -166,7 +166,6 @@
                         return;
                     }
 
-
                     var months = [];
 
                     for (var f = 0; f < files.length; f++) {
@@ -195,8 +194,6 @@
                             indicatorMensalStudents[i][j] = [];
                     }
 
-
-
                     var totalMensalEntries = [];
                     var month = 0;
 
@@ -216,11 +213,6 @@
                         totalMensalEntries.push(numEntries);
                         month++;
                     });
-
-                    // console.log(indicatorMensalCounter);
-                    // console.log(totalMensalEntries);
-
-                    console.log(indicatorMensalStudents);
 
                     var indicatorsColors = indicators.map(function (item) { return item['color']; });
 
