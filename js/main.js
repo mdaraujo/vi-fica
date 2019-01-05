@@ -49,8 +49,7 @@ function createBarChart(chartDivId, xData, yData, totalEntries, items, colors, x
     const svg = d3.select(chartDivId)
         .append("svg")
         .attr("width", width + 1.2 * margin)
-        .attr("height", height + 2 * margin)
-    // .style("border-style", "dotted");
+        .attr("height", height + 2 * margin);
 
     const chart = svg.append('g')
         .attr('transform', `translate(${margin}, ${margin})`);
@@ -58,7 +57,7 @@ function createBarChart(chartDivId, xData, yData, totalEntries, items, colors, x
     const xScale = d3.scaleBand()
         .range([0, width])
         .domain(xData)
-        .padding(0.4)
+        .padding(0.4);
 
     var yExtent = d3.extent(yData, function (d) { return d });
 
@@ -67,7 +66,7 @@ function createBarChart(chartDivId, xData, yData, totalEntries, items, colors, x
         .domain([0, yExtent[1]]);
 
     const makeYLines = () => d3.axisLeft()
-        .scale(yScale)
+        .scale(yScale);
 
     chart.append('g')
         .attr('transform', `translate(0, ${height})`)
@@ -120,8 +119,7 @@ function createBarChart(chartDivId, xData, yData, totalEntries, items, colors, x
 
     chart.append('g')
         .attr('class', 'grid')
-        .call(d3.axisLeft()
-            .scale(yScale)
+        .call(makeYLines()
             .tickSize(-width, 0, 0)
             .tickFormat(''));
 
@@ -198,8 +196,7 @@ function createLineGraph(graphDivId, xData, yData, totalEntries, items, indicato
     const svg = d3.select(graphDivId)
         .append("svg")
         .attr("width", width + 1.2 * margin)
-        .attr("height", height + 2 * margin)
-    // .style("border-style", "dotted");
+        .attr("height", height + 2 * margin);
 
     const graph = svg.append('g')
         .attr('transform', `translate(${margin}, ${margin})`);
@@ -224,7 +221,7 @@ function createLineGraph(graphDivId, xData, yData, totalEntries, items, indicato
         .domain([0, yExtent[1]]);
 
     const makeYLines = () => d3.axisLeft()
-        .scale(yScale)
+        .scale(yScale);
 
     graph.append('g')
         .attr('transform', `translate(0, ${height})`)
@@ -291,8 +288,8 @@ function createLineGraph(graphDivId, xData, yData, totalEntries, items, indicato
                     var ind = c[month].getAttribute("ind");
                     $('#studentsTable').html('');
                     $('#loading_table').show();
-                    graph.selectAll("circle").style("stroke-width", 0);
-                    d3.select(this).style("stroke-width", 4);
+                    graph.selectAll("circle").attr('r', radius).style("stroke-width", 0);
+                    d3.select(this).attr('r', radius * 1.5).style("stroke-width", 4);
                     setTimeout(function () {
                         tabulate(items[ind][month], cols);
                         $('#loading_table').hide();
@@ -311,8 +308,7 @@ function createLineGraph(graphDivId, xData, yData, totalEntries, items, indicato
 
     graph.append('g')
         .attr('class', 'grid')
-        .call(d3.axisLeft()
-            .scale(yScale)
+        .call(makeYLines()
             .tickSize(-width, 0, 0)
             .tickFormat(''));
 

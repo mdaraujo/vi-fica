@@ -18,6 +18,15 @@ line {
     opacity: 0.4;
 }
 
+.grid path {
+    stroke-width: 0;
+}
+
+.grid .tick line {
+    stroke: black;
+    stroke-opacity: 0.3;
+}
+
 @media (min-width: 1500px) {
     .container {
         max-width: 1500px;
