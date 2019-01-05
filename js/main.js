@@ -44,7 +44,7 @@ function tabulate(data, columns) {
 }
 
 
-function createBarChart(chartDivId, xData, yData, totalEntries, items, xLabel, yLabel, title) {
+function createBarChart(chartDivId, xData, yData, totalEntries, items, indicatorsColors, xLabel, yLabel, title) {
 
     const svg = d3.select(chartDivId)
         .append("svg")
@@ -86,8 +86,9 @@ function createBarChart(chartDivId, xData, yData, totalEntries, items, xLabel, y
         .on('click', mainChartBarClick);
 
     bars.append('rect')
-        .attr("stroke", "red")
+        .attr("stroke", "black")
         .attr("stroke-width", 0)
+        .attr("fill", (d, i) => indicatorsColors[i])
         .attr('x', (d, i) => xScale(xData[i]))
         .attr('y', (d) => yScale(d))
         .attr('height', (d) => height - yScale(d))
@@ -153,7 +154,7 @@ function createBarChart(chartDivId, xData, yData, totalEntries, items, xLabel, y
             $('#studentsTable').html('');
             $('#loading_table').show();
             d3.select(this.parentNode).selectAll("rect").attr("stroke-width", 0);
-            d3.select(this).selectAll("rect").attr("stroke-width", 4).attr("stroke", "red");
+            d3.select(this).selectAll("rect").attr("stroke-width", 6).attr("stroke", "black");
             setTimeout(function () {
                 tabulate(items[i], cols);
                 $('#loading_table').hide();

@@ -26,7 +26,7 @@
                 </a>
             </div>
             <div class="col-12 col-md-6 col-lg-3" align="center">
-                <a href="indicators.html" class="btn btn-sm btn-light full_w active">
+                <a href="indicators.html" class="btn btn-sm btn-light full_w">
                     <i class="fas fa-chart-bar mr-2"></i> Indicador
                 </a>
             </div>
@@ -36,7 +36,7 @@
                 </a>
             </div>
             <div class="col-12 col-md-6 col-lg-3" align="center">
-                <a href="mensalEvolution.html" class="btn btn-sm btn-light full_w">
+                <a href="mensalEvolution.html" class="btn btn-sm btn-light full_w active">
                     <i class="fas fa-chart-line mr-2"></i> Evolução de Indicadores
                 </a>
             </div>
@@ -177,8 +177,6 @@
                         months.push(month);
                     }
 
-                    console.log(months);
-
                     // parse values to integers
                     let indicators = dataSet.shift();
                     indicators.forEach(function (ind) { ind['value'] = +ind['value']; });
@@ -219,13 +217,13 @@
                         month++;
                     });
 
-                    console.log(indicatorMensalCounter);
-                    console.log(totalMensalEntries);
+                    // console.log(indicatorMensalCounter);
+                    // console.log(totalMensalEntries);
 
                     console.log(indicatorMensalStudents);
 
                     var indicatorsColors = indicators.map(function (item) { return item['color']; });
-                    console.log(indicatorsColors);
+
                     createLineGraph('#chart',
                         months, indicatorMensalCounter, totalMensalEntries, indicatorMensalStudents, indicatorsColors,
                         "Mês", "Nº de alunos", "Por Comparação Mensal de Indicadores");

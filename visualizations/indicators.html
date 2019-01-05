@@ -191,8 +191,10 @@
                     });
 
                     var indicatorsNames = indicators.map(function (item) { return item['name']; });
+                    var indicatorsColors = indicators.map(function (item) { return item['color']; });
+
                     createBarChart('#chart',
-                        indicatorsNames, indicatorCounter, numEntries, indicatorStudents,
+                        indicatorsNames, indicatorCounter, numEntries, indicatorStudents, indicatorsColors,
                         "Indicadores", "Nº de alunos", "Por Indicador");
                 });
         }

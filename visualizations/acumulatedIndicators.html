@@ -197,8 +197,9 @@
                     });
 
                     var numberOfAcumulatedIndicators = ["0", "1", "2", "3", "4", "5"];
+                    var colors = ["#4682b4", "#4682b4", "#4682b4", "#4682b4", "#4682b4", "#4682b4"];
                     createBarChart('#chart',
-                        numberOfAcumulatedIndicators, acumulatedIndicatorsCounter, numEntries, indicatorStudents,
+                        numberOfAcumulatedIndicators, acumulatedIndicatorsCounter, numEntries, indicatorStudents, colors,
                         "Nº de indicadores acumulados", "Nº de alunos", "Por Acumulação de Indicadores");
                 });
         }
