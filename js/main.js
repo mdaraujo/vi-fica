@@ -47,8 +47,9 @@ function tabulate(data, columns) {
 }
 
 
-function createBarChart(chartDivId, xData, yData, totalEntries, items, colors, xLabel, yLabel, title, subchartDivId, subData, subItems, subXData, subColors) {
+function createBarChart(chartDivId, fullXData, yData, totalEntries, items, colors, xLabel, yLabel, title, subchartDivId, subData, subItems, subXData, subColors) {
     $(chartDivId).html('');
+    let xData = fullXData.map(function (item) { return item.split(' ')[0]; });
     let width = $(chartDivId).width() - 2 * margin;
     const svg = d3.select(chartDivId)
         .append("svg")
@@ -165,7 +166,7 @@ function createBarChart(chartDivId, xData, yData, totalEntries, items, colors, x
             d3.select(this.parentNode).selectAll("rect").attr("stroke-width", 0);
             d3.select(this).selectAll("rect").attr("stroke-width", 4);
             setTimeout(function () {
-                if (subchartDivId) createAuxChart(subchartDivId, subXData, subColors, subData[i], subItems[i])
+                if (subchartDivId) createAuxChart(subchartDivId, subXData, subColors, subData[i], subItems[i], 'Distribuição para ' + fullXData[i])
                 tabulate(items[i], cols);
                 $('#loading_table').hide();
             }, 500);
@@ -193,7 +194,7 @@ function createBarChart(chartDivId, xData, yData, totalEntries, items, colors, x
 }
 
 
-function createAuxChart(chartDivId, xData, colors, data, items){
+function createAuxChart(chartDivId, xData, colors, data, items, title){
     $(chartDivId).html('');
     let width = $(chartDivId).width() - 2 * margin;
     let yData = [];
@@ -300,7 +301,7 @@ function createAuxChart(chartDivId, xData, colors, data, items){
         .attr("fill", "black");
 
     svg.append("text")
-        .text('Distribuição')
+        .text(title)
         .attr("x", width / 2 + margin)
         .attr("y", margin * 0.3)
         .style("font-size", "20px")

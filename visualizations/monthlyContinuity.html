@@ -172,9 +172,10 @@
                     for (var f = 0; f < files.length; f++) {
                         let month = files[f].split("/")[1];
                         month = month.split("_")[1];
+                        let year = +month.substring(0, 4);
                         month = +month.substring(4, 6);
                         month = $.fn.datepicker.dates['pt']['months'][month - 1];
-                        months.push(month);
+                        months.push(month + ' ' + year);
                     }
 
                     // parse values to integers
