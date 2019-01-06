@@ -48,6 +48,7 @@ function tabulate(data, columns) {
 
 
 function createBarChart(chartDivId, xData, yData, totalEntries, items, colors, xLabel, yLabel, title, subchartDivId, subData, subItems, subXData, subColors) {
+    $(chartDivId).html('');
     let width = $(chartDivId).width() - 2 * margin;
     const svg = d3.select(chartDivId)
         .append("svg")
@@ -193,6 +194,7 @@ function createBarChart(chartDivId, xData, yData, totalEntries, items, colors, x
 
 
 function createAuxChart(chartDivId, xData, colors, data, items){
+    $(chartDivId).html('');
     let width = $(chartDivId).width() - 2 * margin;
     let yData = [];
     let totalEntries = 0;
@@ -339,6 +341,7 @@ function createAuxChart(chartDivId, xData, colors, data, items){
 
 
 function createLineGraph(graphDivId, xData, yData, totalEntries, items, indicators, xLabel, yLabel, title) {
+    $(graphDivId).html('');
     const radius = 8;
     let width = $(graphDivId).width() - 2 * margin;
 
