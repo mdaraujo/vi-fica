@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>FICA - Por Indicador</title>
+    <title>FICA - Por Comparação Mensal de Indicadores</title>
 
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/"
         crossorigin="anonymous">
@@ -25,8 +25,8 @@
                     <i class="fas fa-home mr-2"></i> Menu
                 </a>
             </div>
-            <div class="col-12 col-md-6 col-lg-4" align="center">
-                <a href="indicators.html" class="btn btn-sm btn-light full_w active">
+            <div class="col-12 col-md-6 col-lg-2" align="center">
+                <a href="indicators.html" class="btn btn-sm btn-light full_w">
                     <i class="fas fa-chart-bar mr-2"></i> Indicador
                 </a>
             </div>
@@ -40,8 +40,8 @@
                     <i class="fas fa-chart-line mr-2"></i> Evolução de Indicadores
                 </a>
             </div>
-            <div class="col-12 col-md-6 col-lg-2" align="center">
-                <a href="monthlyContinuity.html" class="btn btn-sm btn-light full_w">
+            <div class="col-12 col-md-6 col-lg-4" align="center">
+                <a href="monthlyContinuity.html" class="btn btn-sm btn-light full_w active">
                     <i class="fas fa-chart-line mr-2"></i> Continuidade Mensal
                 </a>
             </div>
@@ -63,6 +63,16 @@
                 <div class="form-group col-12 col-lg-6 pl-3">
                     <label for="start">Mês:</label>
                     <input type="text" id="start" class="date-picker form-control ml-2 mr-2">
+
+                    <label for="end">Até:</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend ml-2">
+                            <div class="input-group-text">
+                                <input type="checkbox" id="range_toggle" title="Ative para definir um período de pesquisa.">
+                            </div>
+                        </div>
+                        <input type="text" id="end" class="date-picker form-control" style="display: none;">
+                    </div>
                 </div>
             </form>
         </div>
@@ -76,12 +86,11 @@
             </div>
         </div>
         <div class="row mt-2">
-            <div class="col-12 col-lg-10">
+            <div class="col-12 col-lg-6">
                 <div id="chart"></div>
             </div>
-            <div class="col-12 col-lg-2 p-5">
-                <ul class="list-group mt-3" id="caption" style="display: none">
-                </ul>
+            <div class="col-12 col-lg-6">
+                <div id="aux_chart"></div>
             </div>
             <div class="col-12 mt-2" align="center" id="loading_table" style="display: none;">
                 <div class="spinner-border" role="status">
@@ -123,13 +132,18 @@
     <script type="text/javascript">
         function update_graphs() {
             $('#chart').html('');
-            $('#caption').hide();
+            $('#aux_chart').html('');
             $('#studentsTable').html('');
 
             $('#loading').show();
             $('#error').hide();
 
-            let files = getFileNames($('#type').val(), $('#start').val(), $('#start').val());
+            let files = null;
+            if ($('#range_toggle:checked').length > 0) {
+                files = getFileNames($('#type').val(), $('#start').val(), $('#end').val());
+            } else {
+                files = getFileNames($('#type').val(), $('#start').val(), $('#start').val());
+            }
 
             let loader = d3
                 .queue()
@@ -153,37 +167,100 @@
                         return;
                     }
 
+                    let months = [];
+
+                    for (var f = 0; f < files.length; f++) {
+                        let month = files[f].split("/")[1];
+                        month = month.split("_")[1];
+                        month = +month.substring(4, 6);
+                        month = $.fn.datepicker.dates['pt']['months'][month - 1];
+                        months.push(month);
+                    }
+
                     // parse values to integers
                     let indicators = dataSet.shift();
                     indicators.forEach(function (ind) { ind['value'] = +ind['value']; });
 
                     // process data
-                    var indicatorCounter = new Array(indicators.length).fill(0);
-                    var indicatorStudents = new Array(indicators.length);
-                    for (var i = 0; i < indicatorStudents.length; i++)
-                        indicatorStudents[i] = [];
-                    var numEntries = 0;
+                    let continuousCounter = new Array(months.length).fill(0);
+                    let continuousStudents = new Array(months.length);
+                    let continuousIndicators = new Array(months.length);
+                    let continuousIndicatorsStudents = new Array(months.length);
+
+                    for (let i = 0; i < months.length; i++) {
+                        continuousStudents[i] = new Array();
+                        continuousIndicators[i] = new Map();
+                        continuousIndicatorsStudents[i] = new Map();
+                    }
+                    let totalMensalEntries = [];
+                    let month = 0;
 
                     dataSet.forEach(function (data) {
+                        var numEntries = 0;
                         data.forEach(function (entry) {
-                            var i;
-                            for (i = 0; i < indicators.length; i++) {
+                            numEntries++;
+                            let acumulated = [];
+                            let hasOne = false;
+                            for (let i = 0; i < indicators.length; i++) {
                                 if (+entry[indicators[i]['column']] >= indicators[i]['value']) {
-                                    indicatorCounter[i]++;
-                                    indicatorStudents[i].push(entry);
+                                    hasOne = true;
+                                    acumulated.push(indicators[i]['name']);
                                 }
                             }
-                            numEntries++;
+
+                            if (hasOne) {
+                                if (month > 0) {
+                                    for (let i = 0; i < continuousStudents[month - 1].length; i++) {
+                                        if (continuousStudents[month - 1][i]['Numero'] === entry['Numero']) {
+                                            continuousCounter[month]++;
+                                            continuousStudents[month].push(entry);
+
+                                            for (let i = 0; i < acumulated.length; i++) {
+                                                if (continuousIndicators[month].has(acumulated[i])) {
+                                                    continuousIndicators[month].set(acumulated[i],
+                                                        continuousIndicators[month].get(acumulated[i]) + 1);
+                                                } else {
+                                                    continuousIndicators[month].set(acumulated[i], 1);
+                                                    continuousIndicatorsStudents[month].set(acumulated[i], new Array());
+                                                }
+                                                continuousIndicatorsStudents[month].get(acumulated[i]).push(entry);
+                                            }
+                                            break;
+                                        }
+                                    }
+                                }
+                                else {
+                                    continuousCounter[month]++;
+                                    continuousStudents[month].push(entry);
+                                    for (let i = 0; i < acumulated.length; i++) {
+                                        if (continuousIndicators[month].has(acumulated[i])) {
+                                            continuousIndicators[month].set(acumulated[i],
+                                                continuousIndicators[month].get(acumulated[i]) + 1);
+                                        } else {
+                                            continuousIndicators[month].set(acumulated[i], 1);
+                                            continuousIndicatorsStudents[month].set(acumulated[i], new Array());
+                                        }
+                                        continuousIndicatorsStudents[month].get(acumulated[i]).push(entry);
+                                    }
+                                }
+                            }
                         });
+                        totalMensalEntries.push(numEntries);
+                        month++;
                     });
 
-                    var indicatorsNames = indicators.map(function (item) { return item['name']; });
-                    var indicatorsColors = indicators.map(function (item) { return item['color']; });
+                    let colors = [];
+                    months.forEach(m => {
+                        colors.push("#4682b4");
 
-                    createBarChart('#chart',
-                        indicatorsNames, indicatorCounter, numEntries, indicatorStudents, indicatorsColors,
-                        "Indicadores", "Nº de alunos", "Por Indicador", null, null, null, null, null);
-                    $('#caption').show();
+                    });
+
+                    let indicatorsNames = indicators.map(function (item) { return item['name']; });
+                    let indicatorsColors = indicators.map(function (item) { return item['color']; });
+                    createBarChart( '#chart',
+                        months, continuousCounter, totalMensalEntries, continuousStudents, colors,
+                        "Mês", "Nº de alunos", "Alunos que continuam com pelo menos um indicador",
+                        '#aux_chart', continuousIndicators, continuousIndicatorsStudents, indicatorsNames, indicatorsColors);
                 });
         }
         window.addEventListener("resize", update_graphs);

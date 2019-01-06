@@ -1,4 +1,7 @@
-var cols = ["Numero", "Nome", "CursoNome", "AnoLetivoMatricula", "EstadoMatricula", "AnoCurricular",
+const margin = 80;
+const height = window.innerHeight / 2 - 2 * margin;
+
+let cols = ["Numero", "Nome", "CursoNome", "AnoLetivoMatricula", "EstadoMatricula", "AnoCurricular",
     "IND2_1", "ECTS_InscritosAnoAtual", "ECTS_InscritoAnoAtualSemestre1", "ECTS_FeitosAnoAtual",
     "IND2_2", "Propina_TotalEmDivida",
     "IND2_3", "BolsaSAS_EstadoBolsa",
@@ -44,8 +47,8 @@ function tabulate(data, columns) {
 }
 
 
-function createBarChart(chartDivId, xData, yData, totalEntries, items, colors, xLabel, yLabel, title) {
-
+function createBarChart(chartDivId, xData, yData, totalEntries, items, colors, xLabel, yLabel, title, subchartDivId, subData, subItems, subXData, subColors) {
+    let width = $(chartDivId).width() - 2 * margin;
     const svg = d3.select(chartDivId)
         .append("svg")
         .attr("width", width + 1.2 * margin)
@@ -125,12 +128,11 @@ function createBarChart(chartDivId, xData, yData, totalEntries, items, colors, x
 
     if (!Array.isArray(totalEntries)) {
         svg.append("text")
-            .text("Número total de alunos: " + totalEntries)
+            .text("# Alunos: " + totalEntries)
             .attr('x', margin * 0.2)
             .attr('y', margin * 0.25)
             .attr("fill", "black");
     }
-
 
     svg.append("text")
         .text(xLabel)
@@ -162,6 +164,7 @@ function createBarChart(chartDivId, xData, yData, totalEntries, items, colors, x
             d3.select(this.parentNode).selectAll("rect").attr("stroke-width", 0);
             d3.select(this).selectAll("rect").attr("stroke-width", 4);
             setTimeout(function () {
+                if (subchartDivId) createAuxChart(subchartDivId, subXData, subColors, subData[i], subItems[i])
                 tabulate(items[i], cols);
                 $('#loading_table').hide();
             }, 500);
@@ -189,9 +192,155 @@ function createBarChart(chartDivId, xData, yData, totalEntries, items, colors, x
 }
 
 
+function createAuxChart(chartDivId, xData, colors, data, items){
+    let width = $(chartDivId).width() - 2 * margin;
+    let yData = [];
+    let totalEntries = 0;
+    for (let i = 0; i < xData.length; i++) {
+        if (data.has(xData[i])) {
+            yData.push(data.get(xData[i]));
+            totalEntries += data.get(xData[i]);
+        }else{
+            yData.push( 0 );
+        }
+    }
+    $(chartDivId).html('');
+    const svg = d3.select(chartDivId)
+        .append("svg")
+        .attr("width", width + 1.2 * margin)
+        .attr("height", height + 2 * margin);
+
+    const chart = svg.append('g')
+        .attr('transform', `translate(${margin}, ${margin})`);
+
+    const xScale = d3.scaleBand()
+        .range([0, width])
+        .domain(xData)
+        .padding(0.4);
+
+    var yExtent = d3.extent(yData, function (d) { return d });
+
+    const yScale = d3.scaleLinear()
+        .range([height, 0])
+        .domain([0, yExtent[1]]);
+
+    const makeYLines = () => d3.axisLeft()
+        .scale(yScale);
+
+    chart.append('g')
+        .attr('transform', `translate(0, ${height})`)
+        .call(d3.axisBottom(xScale));
+
+    chart.append('g')
+        .call(d3.axisLeft(yScale));
+
+    const bars = chart.selectAll()
+        .data(yData)
+        .enter()
+        .append('g')
+        .style("cursor", "pointer")
+        .on('mouseenter', auxChartBarEnter)
+        .on('mouseleave', auxChartBarLeave)
+        .on('click', auxChartBarClick);
+
+    bars.append('rect')
+        .attr("stroke", "black")
+        .attr("stroke-width", 0)
+        .attr("fill", (d, i) => colors[i])
+        .attr('x', (d, i) => xScale(xData[i]))
+        .attr('y', (d) => yScale(d))
+        .attr('height', (d) => height - yScale(d))
+        .attr('width', xScale.bandwidth());
+
+    bars.append('text')
+        .attr('class', 'value')
+        .attr('x', (d, i) => xScale(xData[i]) + xScale.bandwidth() / 2)
+        .attr('y', (d) => yScale(d) - 20)
+        .attr('text-anchor', 'middle')
+        .text((d) => d)
+        .style("font-size", "16px")
+        .style("font-weight", "bold")
+        .attr("fill", "black");
+
+    bars.append('text')
+        .attr('class', 'value')
+        .attr('x', (d, i) => xScale(xData[i]) + xScale.bandwidth() / 2)
+        .attr('y', (d) => yScale(d) - 5)
+        .attr('text-anchor', 'middle')
+        .text((function (d, i) {
+            if (!Array.isArray(totalEntries))
+                return `(${(d / totalEntries * 100).toFixed(1)}%)`;
+            else
+                return `(${(d / totalEntries[i] * 100).toFixed(1)}%)`;
+        }))
+        .style("font-size", "12px")
+        .attr("fill", "black");
+
+    chart.append('g')
+        .attr('class', 'grid')
+        .call(makeYLines()
+            .tickSize(-width, 0, 0)
+            .tickFormat(''));
+
+    svg.append("text")
+        .text('Indicadores')
+        .attr("x", width / 2 + margin)
+        .attr("y", height + 1.7 * margin)
+        .attr("text-anchor", "middle")
+        .attr("fill", "black");
+
+    svg.append("text")
+        .text('Nº de Alunos')
+        .attr('x', -(height / 2) - margin)
+        .attr('y', margin / 2.8)
+        .attr('transform', 'rotate(-90)')
+        .attr('text-anchor', 'middle')
+        .attr("fill", "black");
+
+    svg.append("text")
+        .text('Distribuição')
+        .attr("x", width / 2 + margin)
+        .attr("y", margin * 0.3)
+        .style("font-size", "20px")
+        .style("font-weight", "bold")
+        .attr("text-anchor", "middle");
+
+    function auxChartBarClick(actual, i) {
+        if (actual > 0) {
+            $('#studentsTable').html('');
+            $('#loading_table').show();
+            d3.select(this.parentNode).selectAll("rect").attr("stroke-width", 0);
+            d3.select(this).selectAll("rect").attr("stroke-width", 4);
+            setTimeout(function () {
+                tabulate(items.get(xData[i]), cols);
+                $('#loading_table').hide();
+            }, 500);
+        }
+    }
+
+    function auxChartBarEnter(actual, i) {
+        d3.select(this).selectAll("rect")
+            .transition()
+            .duration(300)
+            .attr('opacity', 0.6)
+            .attr('x', xScale(xData[i]) - 5)
+            .attr('width', xScale.bandwidth() + 10);
+    }
+
+    function auxChartBarLeave(actual, i) {
+        d3.select(this).selectAll("rect")
+            .transition()
+            .duration(300)
+            .attr('opacity', 1)
+            .attr('x', xScale(xData[i]))
+            .attr('width', xScale.bandwidth());
+    }
+}
+
 
 function createLineGraph(graphDivId, xData, yData, totalEntries, items, indicators, xLabel, yLabel, title) {
     const radius = 8;
+    let width = $(chartDivId).width() - 2 * margin;
 
     const svg = d3.select(graphDivId)
         .append("svg")

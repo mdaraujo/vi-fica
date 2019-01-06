@@ -36,12 +36,12 @@
                 </a>
             </div>
             <div class="col-12 col-md-6 col-lg-2" align="center">
-                <a href="mensalEvolution.html" class="btn btn-sm btn-light full_w">
+                <a href="monthlyEvolution.html" class="btn btn-sm btn-light full_w">
                     <i class="fas fa-chart-line mr-2"></i> Evolução de Indicadores
                 </a>
             </div>
             <div class="col-12 col-md-6 col-lg-2" align="center">
-                <a href="mensalContinuity.html" class="btn btn-sm btn-light full_w">
+                <a href="monthlyContinuity.html" class="btn btn-sm btn-light full_w">
                     <i class="fas fa-chart-line mr-2"></i> Continuidade Mensal
                 </a>
             </div>
@@ -63,16 +63,6 @@
                 <div class="form-group col-12 col-lg-6 pl-3">
                     <label for="start">Mês:</label>
                     <input type="text" id="start" class="date-picker form-control ml-2 mr-2">
-
-                    <label for="end">Até:</label>
-                    <div class="input-group">
-                        <div class="input-group-prepend ml-2">
-                            <div class="input-group-text">
-                                <input type="checkbox" id="range_toggle" title="Ative para definir um período de pesquisa.">
-                            </div>
-                        </div>
-                        <input type="text" id="end" class="date-picker form-control" style="display: none;">
-                    </div>
                 </div>
             </form>
         </div>
@@ -86,10 +76,10 @@
             </div>
         </div>
         <div class="row mt-2">
-            <div class="col-12 col-lg-6">
+            <div class="col-12 col-md-6">
                 <div id="chart"></div>
             </div>
-            <div class="col-12 col-lg-6">
+            <div class="col-12 col-md-6">
                 <div id="aux_chart"></div>
             </div>
             <div class="col-12 mt-2" align="center" id="loading_table" style="display: none;">
@@ -99,7 +89,7 @@
             </div>
             <div class="col-12">
                 <div class="table-responsive">
-                    <table id="studentsTable" class="d3-table table table-fixed table-responsive table-striped table-hover"></table>
+                    <table id="studentsTable" class="d3-table table table-sm table-fixed table-responsive table-striped table-hover"></table>
                 </div>
             </div>
         </div>
@@ -130,10 +120,6 @@
     <script type="text/javascript" src="../js/main.js"></script>
     <script type="text/javascript" src="../js/filters.js"></script>
     <script type="text/javascript">
-        const margin = 80;
-        const width = window.innerWidth / 2 - 2 * margin;
-        const height = window.innerHeight / 2 - 2 * margin;
-
         function update_graphs() {
             $('#chart').html('');
             $('#aux_chart').html('');
@@ -142,12 +128,7 @@
             $('#loading').show();
             $('#error').hide();
 
-            let files = null;
-            if ($('#range_toggle:checked').length > 0) {
-                files = getFileNames($('#type').val(), $('#start').val(), $('#end').val());
-            } else {
-                files = getFileNames($('#type').val(), $('#start').val(), $('#start').val());
-            }
+            let files = getFileNames($('#type').val(), $('#start').val(), $('#start').val());
 
             let loader = d3
                 .queue()
@@ -177,37 +158,54 @@
                     indicators.forEach(function (ind) { ind['value'] = +ind['value']; });
 
                     // process data
-                    var acumulatedIndicatorsCounter = new Array(indicators.length + 1).fill(0);
+                    let acumulatedIndicatorsCounter = new Array(indicators.length + 1).fill(0);
+                    let acumulatedIndicatorsCounterStudents = new Array(indicators.length + 1);
+                    let acumulatedIndicators = new Array(indicators.length + 1);
+                    let acumulatedIndicatorsStudents = new Array(indicators.length + 1);
 
-                    var indicatorStudents = new Array(indicators.length + 1);
-                    for (var i = 0; i < indicatorStudents.length; i++) {
-                        indicatorStudents[i] = [];
+                    for (let i = 0; i < acumulatedIndicatorsCounterStudents.length; i++) {
+                        acumulatedIndicatorsCounterStudents[i] = new Array();
+                        acumulatedIndicators[i] = new Map();
+                        acumulatedIndicatorsStudents[i] = new Map();
                     }
 
                     var numEntries = 0;
                     dataSet.forEach(function (data) {
                         data.forEach(function (entry) {
-                            var acumulated = 0;
-                            var i;
-                            for (i = 0; i < indicators.length; i++) {
+                            let acumulated = [];
+                            for (let i = 0; i < indicators.length; i++) {
                                 if (+entry[indicators[i]['column']] >= indicators[i]['value']) {
-                                    acumulated++;
+                                    acumulated.push(indicators[i]['name']);
                                 }
                             }
+                            acumulatedIndicatorsCounter[acumulated.length]++;
+                            acumulatedIndicatorsCounterStudents[acumulated.length].push(entry);
 
-                            acumulatedIndicatorsCounter[acumulated]++;
-                            indicatorStudents[acumulated].push(entry);
+                            for (let i = 0; i < acumulated.length; i++) {
+                                if (acumulatedIndicators[acumulated.length].has(acumulated[i])){
+                                    acumulatedIndicators[acumulated.length].set(acumulated[i],
+                                        acumulatedIndicators[acumulated.length].get(acumulated[i])+1);
+                                }else{
+                                    acumulatedIndicators[acumulated.length].set(acumulated[i], 1);
+                                    acumulatedIndicatorsStudents[acumulated.length].set(acumulated[i], new Array());
+                                }
+                                acumulatedIndicatorsStudents[acumulated.length].get(acumulated[i]).push(entry);
+                            }
                             numEntries++;
                         });
                     });
 
-                    var numberOfAcumulatedIndicators = ["0", "1", "2", "3", "4", "5"];
-                    var colors = ["#4682b4", "#4682b4", "#4682b4", "#4682b4", "#4682b4", "#4682b4"];
-                    createBarChart('#chart',
-                        numberOfAcumulatedIndicators, acumulatedIndicatorsCounter, numEntries, indicatorStudents, colors,
-                        "Nº de indicadores acumulados", "Nº de alunos", "Por Acumulação de Indicadores");
+                    let numberOfAcumulatedIndicators = ["0", "1", "2", "3", "4", "5"];
+                    let colors = ["#4682b4", "#4682b4", "#4682b4", "#4682b4", "#4682b4", "#4682b4"];
+                    let indicatorsNames = indicators.map(function (item) { return item['name']; });
+                    let indicatorsColors = indicators.map(function (item) { return item['color']; });
+                    createBarChart( '#chart',
+                                    numberOfAcumulatedIndicators, acumulatedIndicatorsCounter, numEntries, acumulatedIndicatorsCounterStudents, colors,
+                                    "Nº de indicadores acumulados", "Nº de alunos", "Por Acumulação de Indicadores",
+                                    '#aux_chart', acumulatedIndicators, acumulatedIndicatorsStudents, indicatorsNames, indicatorsColors);
                 });
         }
+        window.addEventListener("resize", update_graphs);
     </script>
 </body>
 

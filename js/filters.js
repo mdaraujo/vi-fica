@@ -82,16 +82,19 @@ $(document).ready(function () {
     d3.csv("../config/indicators.csv", function (error, data) {
         if (!error) {
             data.forEach(function (entry) {
-                $("#accordion").append(' \
-                            <div class="card">  \
-                                <div class="card-header" id="heading_' + entry.name + '"> \
-                                    <button style="color:' + entry.color + '" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse_' + entry.name + '" aria-expanded="false" aria-controls="collapseThree"> <i class="fas fa-hand-pointer mr-2"></i>' + entry.name + ' </button>   \
-                                </div>  \
-                                <div id="collapse_' + entry.name + '" class="collapse" aria-labelledby="heading_' + entry.name + '" data-parent="#accordion">   \
-                                    <div class="card-body"> ' + entry.description + ' </div>    \
-                                </div>  \
-                            </div>' );
-
+                $("#accordion").append( '<div class="card">' +
+                    '<div class="card-header" id="heading_' + entry.name + '">' +
+                    '<button style="color:' + entry.color + '" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse_' + entry.name + '" aria-expanded="false" aria-controls="collapseThree">' +
+                    '<i class="fas fa-hand-pointer mr-2"></i>' + entry.name +
+                    '</button>' +
+                    '</div>' +
+                    '<div id="collapse_' + entry.name + '" class="collapse" aria-labelledby="heading_' + entry.name + '" data-parent="#accordion">' +
+                    '<div class="card-body"> ' + entry.description + ' </div>' +
+                    '</div>' +
+                    '</div>' );
+                $("#caption").append(   '<li class="list-group-item" style="color:' + entry.color + '" title="' + entry.description + '">' +
+                    '<i class="fas fa-circle mr-2"></i>' + entry.name +
+                    '</li>');
             });
         }
     });
