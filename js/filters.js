@@ -30,6 +30,18 @@ $(document).ready(function () {
         }
     });
 
+    $('#start').on("change", function (event) {
+        if ($('#range_toggle').prop('checked') && $(this).val() > $('#end').val()){
+            $(this).datepicker("setDate", $('#end').val());
+        }
+    });
+
+    $('#end').on("change", function (event) {
+        if ($(this).val() < $('#start').val()) {
+            $(this).datepicker("setDate", $('#start').val());
+        }
+    });
+
     $('#type').on("change", function (event) {
         let courses = $("#courses");
         if ($(this).find(':selected').length > 0 && $(this).find(':selected').data('courses').length > 0) {
