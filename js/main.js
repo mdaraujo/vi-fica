@@ -340,7 +340,7 @@ function createAuxChart(chartDivId, xData, colors, data, items){
 
 function createLineGraph(graphDivId, xData, yData, totalEntries, items, indicators, xLabel, yLabel, title) {
     const radius = 8;
-    let width = $(chartDivId).width() - 2 * margin;
+    let width = $(graphDivId).width() - 2 * margin;
 
     const svg = d3.select(graphDivId)
         .append("svg")
