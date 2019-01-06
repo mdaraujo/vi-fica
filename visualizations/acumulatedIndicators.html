@@ -182,10 +182,10 @@
                             acumulatedIndicatorsCounterStudents[acumulated.length].push(entry);
 
                             for (let i = 0; i < acumulated.length; i++) {
-                                if (acumulatedIndicators[acumulated.length].has(acumulated[i])){
+                                if (acumulatedIndicators[acumulated.length].has(acumulated[i])) {
                                     acumulatedIndicators[acumulated.length].set(acumulated[i],
-                                        acumulatedIndicators[acumulated.length].get(acumulated[i])+1);
-                                }else{
+                                        acumulatedIndicators[acumulated.length].get(acumulated[i]) + 1);
+                                } else {
                                     acumulatedIndicators[acumulated.length].set(acumulated[i], 1);
                                     acumulatedIndicatorsStudents[acumulated.length].set(acumulated[i], new Array());
                                 }
@@ -195,14 +195,20 @@
                         });
                     });
 
-                    let numberOfAcumulatedIndicators = ["0 Indicadores Acumulados", "1 Indicadores Acumulados", "2 Indicadores Acumulados", "3 Indicadores Acumulados", "4 Indicadores Acumulados", "5 Indicadores Acumulados"];
-                    let colors = ["#4682b4", "#4682b4", "#4682b4", "#4682b4", "#4682b4", "#4682b4"];
+                    let numberOfAcumulatedIndicators = [];
+                    let colors = [];
+
+                    for (let i = 0; i <= indicators.length; i++) {
+                        numberOfAcumulatedIndicators.push(i + " Indicadores Acumulados");
+                        colors.push("#4682b4");
+                    }
+
                     let indicatorsNames = indicators.map(function (item) { return item['name']; });
                     let indicatorsColors = indicators.map(function (item) { return item['color']; });
-                    createBarChart( '#chart',
-                                    numberOfAcumulatedIndicators, acumulatedIndicatorsCounter, numEntries, acumulatedIndicatorsCounterStudents, colors,
-                                    "Nº de indicadores acumulados", "Nº de alunos", "Por Acumulação de Indicadores",
-                                    '#aux_chart', acumulatedIndicators, acumulatedIndicatorsStudents, indicatorsNames, indicatorsColors);
+                    createBarChart('#chart',
+                        numberOfAcumulatedIndicators, acumulatedIndicatorsCounter, numEntries, acumulatedIndicatorsCounterStudents, colors,
+                        "Nº de indicadores acumulados", "Nº de alunos", "Por Acumulação de Indicadores",
+                        '#aux_chart', acumulatedIndicators, acumulatedIndicatorsStudents, indicatorsNames, indicatorsColors);
                 });
         }
         window.addEventListener("resize", update_graphs);
