@@ -131,8 +131,9 @@ function createBarChart(chartDivId, fullXData, yData, totalEntries, items, color
     if (!Array.isArray(totalEntries)) {
         svg.append("text")
             .text("# Alunos: " + totalEntries)
-            .attr('x', margin * 0.2)
+            .attr('x', 0)
             .attr('y', margin * 0.25)
+            .style("font-weight", "bold")
             .attr("fill", "black");
     }
 
@@ -194,15 +195,15 @@ function createBarChart(chartDivId, fullXData, yData, totalEntries, items, color
 }
 
 
-function createAuxChart(chartDivId, xData, colors, data, items, title, totalEntries){
+function createAuxChart(chartDivId, xData, colors, data, items, title, totalEntries) {
     $(chartDivId).html('');
     let width = $(chartDivId).width() - 2 * margin;
     let yData = [];
     for (let i = 0; i < xData.length; i++) {
         if (data.has(xData[i])) {
             yData.push(data.get(xData[i]));
-        }else{
-            yData.push( 0 );
+        } else {
+            yData.push(0);
         }
     }
     $(chartDivId).html('');
@@ -282,6 +283,15 @@ function createAuxChart(chartDivId, xData, colors, data, items, title, totalEntr
         .call(makeYLines()
             .tickSize(-width, 0, 0)
             .tickFormat(''));
+
+    if (!Array.isArray(totalEntries)) {
+        svg.append("text")
+            .text("# Alunos: " + totalEntries)
+            .attr('x', 0)
+            .attr('y', margin * 0.25)
+            .style("font-weight", "bold")
+            .attr("fill", "black");
+    }
 
     svg.append("text")
         .text('Indicadores')
