@@ -166,7 +166,7 @@ function createBarChart(chartDivId, fullXData, yData, totalEntries, items, color
             d3.select(this.parentNode).selectAll("rect").attr("stroke-width", 0);
             d3.select(this).selectAll("rect").attr("stroke-width", 4);
             setTimeout(function () {
-                if (subchartDivId) createAuxChart(subchartDivId, subXData, subColors, subData[i], subItems[i], 'Distribuição para ' + fullXData[i])
+                if (subchartDivId) createAuxChart(subchartDivId, subXData, subColors, subData[i], subItems[i], 'Distribuição para ' + fullXData[i], yData[i])
                 tabulate(items[i], cols);
                 $('#loading_table').hide();
             }, 500);
@@ -194,15 +194,13 @@ function createBarChart(chartDivId, fullXData, yData, totalEntries, items, color
 }
 
 
-function createAuxChart(chartDivId, xData, colors, data, items, title){
+function createAuxChart(chartDivId, xData, colors, data, items, title, totalEntries){
     $(chartDivId).html('');
     let width = $(chartDivId).width() - 2 * margin;
     let yData = [];
-    let totalEntries = 0;
     for (let i = 0; i < xData.length; i++) {
         if (data.has(xData[i])) {
             yData.push(data.get(xData[i]));
-            totalEntries += data.get(xData[i]);
         }else{
             yData.push( 0 );
         }
