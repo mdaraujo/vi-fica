@@ -79,7 +79,7 @@ $(document).ready(function () {
         weekStart: 1,
     };
 
-    let current = new Date();
+    let current = new Date(2017, 9, 1, 1, 1, 1, 1);
     let date_pickers = $('.date-picker');
     date_pickers.val(current.getFullYear() + '-' + lpad(current.getMonth() + 1, 0, 2));
     checkLocalStorage(date_pickers);
